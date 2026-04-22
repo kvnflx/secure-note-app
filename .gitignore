@@ -1,0 +1,20 @@
+# Go
+/bin/
+/dist/
+*.test
+*.out
+coverage.*
+
+# Node
+/web-src/node_modules/
+/web/assets-built/
+/web-src/dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
