@@ -5,8 +5,8 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/fynnsh/burn-note/internal/config"
@@ -32,7 +32,7 @@ type powReq struct {
 }
 
 type createReq struct {
-	Ciphertext  string `json:"ciphertext"`
+	Ciphertext  string `json:"ciphertext"` // standard base64 with padding
 	ExpiresIn   int    `json:"expires_in"`
 	HasPassword bool   `json:"has_password"`
 	POW         powReq `json:"pow"`
@@ -133,9 +133,9 @@ func (h *Handler) CreateNote(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) RevealNote(w http.ResponseWriter, r *http.Request) {
-	id := strings.TrimSuffix(strings.TrimPrefix(r.URL.Path, "/api/notes/"), "/reveal")
+	id := r.PathValue("id")
 	n, err := h.Store.RevealNote(r.Context(), id)
-	if err == storage.ErrNotFound {
+	if errors.Is(err, storage.ErrNotFound) {
 		h.writeErr(w, 404, "gone", "already_read_or_expired")
 		return
 	}
@@ -154,14 +154,14 @@ type killReq struct {
 }
 
 func (h *Handler) KillNote(w http.ResponseWriter, r *http.Request) {
-	id := strings.TrimPrefix(r.URL.Path, "/api/notes/")
+	id := r.PathValue("id")
 	var req killReq
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.KillToken == "" {
 		h.writeErr(w, 400, "bad_request", "")
 		return
 	}
 	err := h.Store.KillNote(r.Context(), id, crypto.HashToken(req.KillToken))
-	if err == storage.ErrNotFound {
+	if errors.Is(err, storage.ErrNotFound) {
 		h.writeErr(w, 404, "gone", "")
 		return
 	}

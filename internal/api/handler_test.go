@@ -81,6 +81,7 @@ func TestCreateAndRevealAndGone(t *testing.T) {
 
 	// Reveal.
 	req = httptest.NewRequest("POST", "/api/notes/"+cr.ID+"/reveal", nil)
+	req.SetPathValue("id", cr.ID)
 	w = httptest.NewRecorder()
 	h.RevealNote(w, req)
 	if w.Code != 200 {
@@ -89,6 +90,7 @@ func TestCreateAndRevealAndGone(t *testing.T) {
 
 	// Second reveal must be 404 gone.
 	req = httptest.NewRequest("POST", "/api/notes/"+cr.ID+"/reveal", nil)
+	req.SetPathValue("id", cr.ID)
 	w = httptest.NewRecorder()
 	h.RevealNote(w, req)
 	if w.Code != 404 {
@@ -131,6 +133,7 @@ func TestKillRequiresCorrectToken(t *testing.T) {
 	// Wrong token.
 	kb, _ := json.Marshal(map[string]string{"kill_token": "wrong"})
 	req = httptest.NewRequest("DELETE", "/api/notes/"+cr.ID, bytes.NewReader(kb))
+	req.SetPathValue("id", cr.ID)
 	w = httptest.NewRecorder()
 	h.KillNote(w, req)
 	if w.Code != 403 {
@@ -140,6 +143,7 @@ func TestKillRequiresCorrectToken(t *testing.T) {
 	// Right token.
 	kb, _ = json.Marshal(map[string]string{"kill_token": cr.KillToken})
 	req = httptest.NewRequest("DELETE", "/api/notes/"+cr.ID, bytes.NewReader(kb))
+	req.SetPathValue("id", cr.ID)
 	w = httptest.NewRecorder()
 	h.KillNote(w, req)
 	if w.Code != 204 {
