@@ -10,6 +10,10 @@ coverage.*
 /web-src/dist/
 /web/
 
+# Built frontend assets copied next to main.go for embedding
+/cmd/burn/web-assets/*
+!/cmd/burn/web-assets/.gitkeep
+
 # IDE
 .idea/
 .vscode/

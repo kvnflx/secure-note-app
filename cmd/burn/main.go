@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	_ "embed"
+	"embed"
 	"errors"
 	"log"
 	"net/http"
@@ -18,6 +18,9 @@ import (
 
 //go:embed shell.html
 var shellHTML []byte
+
+//go:embed all:web-assets
+var webFS embed.FS
 
 func main() {
 	cfg, err := config.Load()
@@ -35,7 +38,11 @@ func main() {
 	defer store.Close()
 
 	h := api.New(cfg, store, shellHTML)
-	handler := api.Recover(api.SecurityHeaders(api.MaxJSONBytes(int64(cfg.MaxCiphertextKB)*1024*2, h.Routes())))
+	static, err := api.StaticHandler(webFS)
+	if err != nil {
+		log.Fatalf("static: %v", err)
+	}
+	handler := api.Recover(api.SecurityHeaders(api.MaxJSONBytes(int64(cfg.MaxCiphertextKB)*1024*2, h.RoutesWithStatic(static))))
 
 	srv := &http.Server{
 		Addr:              cfg.ListenAddr,
