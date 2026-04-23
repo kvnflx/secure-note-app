@@ -126,3 +126,14 @@ pre code.hljs {
   border-radius: 6px;
   z-index: 10;
 }
+
+@media (max-width: 480px) {
+  main { padding: 0.75rem; }
+  h1 { font-size: 1.25rem; }
+  textarea { font-size: 16px; } /* prevents iOS auto-zoom on focus */
+  .row { gap: 0.5rem; }
+  button { width: 100%; }
+  .copy-plain { width: 100%; }
+  .toolbar button { width: auto; }
+  header.global { padding: 0.5rem 0.75rem; }
+}
