@@ -1,0 +1,49 @@
+services:
+  caddy:
+    image: caddy:2-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - burn
+    restart: unless-stopped
+
+  burn:
+    image: ghcr.io/fynnsh/burn-note:latest
+    restart: unless-stopped
+    environment:
+      BURN_LISTEN_ADDR: ":8080"
+      BURN_REDIS_SOCKET: /sockets/redis.sock
+      BURN_REDIS_NETWORK: unix
+      BURN_POW_DIFFICULTY: "20"
+      BURN_MAX_CIPHERTEXT_KB: "100"
+    volumes:
+      - sockets:/sockets
+    read_only: true
+    user: "65532:65532"
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "/etc/redis/redis.conf"]
+    volumes:
+      - ./redis.conf:/etc/redis/redis.conf:ro
+      - sockets:/sockets
+    tmpfs:
+      - /data
+    read_only: true
+    restart: unless-stopped
+
+volumes:
+  caddy_data:
+  caddy_config:
+  sockets:

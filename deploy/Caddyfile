@@ -1,0 +1,19 @@
+note.backsafe.de {
+    encode zstd gzip
+
+    reverse_proxy burn:8080
+
+    log {
+        output discard
+    }
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        Content-Security-Policy "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; worker-src 'self'"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        Referrer-Policy "no-referrer"
+        Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()"
+        -Server
+    }
+}
