@@ -58,7 +58,28 @@ export function renderReveal(root, id) {
       cd.innerHTML = `⏱ <span id="cd">1:00</span> <button id="extend" type="button">+60s</button>`;
       content.parentNode.insertBefore(cd, content);
 
-      content.textContent = new TextDecoder().decode(pt);
+      const decoded = new TextDecoder().decode(pt);
+      const m = /^```(\w*)\n([\s\S]*)\n```$/.exec(decoded);
+      if (m) {
+        const lang = m[1] || 'plaintext';
+        const code = m[2];
+        try {
+          const hljs = (await import('highlight.js/lib/core')).default;
+          let result;
+          try {
+            const langMod = await import(/* @vite-ignore */ `highlight.js/lib/languages/${lang}`);
+            hljs.registerLanguage(lang, langMod.default);
+            result = hljs.highlight(code, { language: lang }).value;
+          } catch {
+            result = code.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+          }
+          content.innerHTML = `<pre><code class="hljs language-${lang}">${result}</code></pre>`;
+        } catch {
+          content.textContent = decoded;
+        }
+      } else {
+        content.textContent = decoded;
+      }
       content.hidden = false;
       const toolbar = root.querySelector('#revealToolbar');
       toolbar.hidden = false;

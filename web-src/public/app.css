@@ -101,3 +101,15 @@ header.global {
 .pwBar[data-level="strong"] { background: #bbf7d0; color: #14532d; }
 .pwBar[data-level="too_common"] { background: #fca5a5; color: #7f1d1d; }
 #pwArea input { width: 100%; }
+pre code.hljs {
+  display: block;
+  padding: 0.75rem;
+  border-radius: 6px;
+  overflow: auto;
+  background: var(--border);
+  color: var(--fg);
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.codeModeLabel { display: inline-flex; align-items: center; gap: 0.25rem; color: var(--muted); font-size: 0.9rem; }

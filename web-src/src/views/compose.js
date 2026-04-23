@@ -12,7 +12,10 @@ export function renderCompose(root) {
         <p class="tag">${t('compose.tag', 'one-time notes, zero metadata')}</p>
       </header>
       <textarea id="msg" rows="10" placeholder="${t('compose.placeholder', 'Write your message…')}" autocomplete="off" spellcheck="false"></textarea>
-      <div class="toolbar"><button id="mask" type="button">👁 Hide</button></div>
+      <div class="toolbar">
+        <button id="mask" type="button">👁 Hide</button>
+        <label class="codeModeLabel"><input type="checkbox" id="codeMode"> &lt;/&gt; Code mode</label>
+      </div>
       <div class="row">
         <label>${t('compose.expiry', 'Expiry')}
           <select id="expiry">
@@ -44,6 +47,7 @@ export function renderCompose(root) {
   const pwArea = root.querySelector('#pwArea');
   const pw = root.querySelector('#pw');
   const pwBar = root.querySelector('#pwBar');
+  const codeMode = root.querySelector('#codeMode');
 
   pwToggle.addEventListener('change', () => {
     pwArea.hidden = !pwToggle.checked;
@@ -59,19 +63,20 @@ export function renderCompose(root) {
     });
   }
 
-  btn.addEventListener('click', () => submit(ta, sel, btn, status, pwToggle, pw));
+  btn.addEventListener('click', () => submit(ta, sel, btn, status, pwToggle, pw, codeMode));
   import('../ui/mask.js').then(m => m.attachMask(ta, root.querySelector('#mask')));
 }
 
-async function submit(ta, sel, btn, status, pwToggle, pwInput) {
+async function submit(ta, sel, btn, status, pwToggle, pwInput, codeMode) {
   const text = ta.value;
   if (!text) return;
+  const plaintext = codeMode?.checked ? '```\n' + text + '\n```' : text;
   btn.disabled = true;
   status.textContent = '🔒 Encrypting…';
   try {
     await ready();
     const payloadKey = randomKey();
-    const ct = encrypt(payloadKey, new TextEncoder().encode(text));
+    const ct = encrypt(payloadKey, new TextEncoder().encode(plaintext));
 
     let fragment = `#k=${toB64Url(payloadKey)}`;
     let hasPassword = false;
