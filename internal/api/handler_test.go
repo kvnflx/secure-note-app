@@ -34,7 +34,7 @@ func testHandler(t *testing.T) *Handler {
 		ExpiryOptions:   []int{60, 3600},
 		MaxExpirySec:    2592000,
 	}
-	return New(cfg, s, []byte("<html>shell</html>"))
+	return New(cfg, s, []byte("<html><title>One-Time Note</title>shell</html>"))
 }
 
 func obtainPOW(t *testing.T, h *Handler) (seed, nonce string) {
@@ -159,7 +159,7 @@ func TestRevealShellIsStatic(t *testing.T) {
 	if w.Code != 200 {
 		t.Errorf("want 200, got %d", w.Code)
 	}
-	if !strings.Contains(w.Body.String(), "shell") {
+	if !strings.Contains(w.Body.String(), "One-Time Note") {
 		t.Error("expected shell html body")
 	}
 }
