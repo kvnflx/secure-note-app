@@ -116,7 +116,7 @@ func (r *RedisStore) KillNote(ctx context.Context, id, killTokenHash string) err
 	case 0:
 		return ErrNotFound
 	case -1:
-		return errors.New("storage: kill token mismatch")
+		return ErrKillTokenMismatch
 	default:
 		return errors.New("storage: unexpected kill result")
 	}

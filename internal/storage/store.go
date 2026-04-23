@@ -8,8 +8,9 @@ import (
 )
 
 var (
-	ErrNotFound       = errors.New("storage: not found")
-	ErrPOWSeedInvalid = errors.New("storage: pow seed invalid or spent")
+	ErrNotFound          = errors.New("storage: not found")
+	ErrPOWSeedInvalid    = errors.New("storage: pow seed invalid or spent")
+	ErrKillTokenMismatch = errors.New("storage: kill token mismatch")
 )
 
 type Note struct {
