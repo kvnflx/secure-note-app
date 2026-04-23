@@ -1,0 +1,84 @@
+# Synology-specific compose file for burn-note.
+#
+# Differences from the reference deploy/docker-compose.yml:
+# - No Caddy: cloudflared handles TLS at the edge, the NAS serves HTTP only.
+# - The `burn` container publishes :8080 on the Docker bridge network under a
+#   stable name ("burn-note") so cloudflared can reach it by hostname.
+# - Redis stays on a shared Docker socket volume, tmpfs data dir, no persistence.
+# - Restart policy: always (survives NAS reboots).
+# - Resource limits sized for a low-end DS box.
+#
+# Deploy via Portainer → Stacks → Add stack → paste this file.
+
+services:
+  burn:
+    container_name: burn-note
+    image: ghcr.io/kvnflx/burn-note:latest
+    restart: always
+    environment:
+      BURN_LISTEN_ADDR: ":8080"
+      BURN_REDIS_SOCKET: /sockets/redis.sock
+      BURN_REDIS_NETWORK: unix
+      BURN_POW_DIFFICULTY: "20"
+      BURN_MAX_CIPHERTEXT_KB: "100"
+    expose:
+      - "8080"
+    volumes:
+      - sockets:/sockets
+    read_only: true
+    user: "65532:65532"
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      redis:
+        condition: service_started
+    networks:
+      - burn_net
+      - cloudflared_net
+    mem_limit: 128m
+
+  redis:
+    container_name: burn-redis
+    image: redis:7-alpine
+    restart: always
+    command:
+      - redis-server
+      - --unixsocket
+      - /sockets/redis.sock
+      - --unixsocketperm
+      - "770"
+      - --port
+      - "0"
+      - --appendonly
+      - "no"
+      - --save
+      - ""
+      - --maxmemory
+      - "256mb"
+      - --maxmemory-policy
+      - volatile-ttl
+      - --protected-mode
+      - "no"
+    volumes:
+      - sockets:/sockets
+    tmpfs:
+      - /data
+    read_only: true
+    networks:
+      - burn_net
+    mem_limit: 384m
+
+volumes:
+  sockets:
+
+networks:
+  burn_net:
+    driver: bridge
+  # This network MUST already exist — cloudflared attaches to it so it can
+  # reach `burn-note:8080`. Create it once with:
+  #   docker network create cloudflared_net
+  # OR attach cloudflared to `burn_net` instead (see docs/SYNOLOGY.md).
+  cloudflared_net:
+    external: true
