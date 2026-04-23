@@ -113,3 +113,16 @@ pre code.hljs {
   line-height: 1.4;
 }
 .codeModeLabel { display: inline-flex; align-items: center; gap: 0.25rem; color: var(--muted); font-size: 0.9rem; }
+.skip-link {
+  position: absolute;
+  left: -9999px;
+}
+.skip-link:focus-visible {
+  left: 1rem;
+  top: 1rem;
+  padding: 0.5rem 1rem;
+  background: var(--accent);
+  color: var(--accent-fg);
+  border-radius: 6px;
+  z-index: 10;
+}

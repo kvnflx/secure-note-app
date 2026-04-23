@@ -5,7 +5,7 @@ export function renderSuccess(root, data) {
   const expiry = new Date(data.expiresAt * 1000).toLocaleString();
   root.innerHTML = `
     <section class="success">
-      <h1>✓ ${t('success.title', 'Note created')}</h1>
+      <h1 tabindex="-1">✓ ${t('success.title', 'Note created')}</h1>
       <p>${t('success.intro', 'Share this link:')}</p>
       <div class="row">
         <input id="link" type="text" readonly value="${escape(data.url)}">
@@ -21,7 +21,7 @@ export function renderSuccess(root, data) {
       <h2>${t('success.kill.title', 'Kill switch')}</h2>
       <p>${t('success.kill.hint', 'You can destroy this note manually at any time:')}</p>
       <button id="kill" class="danger">⚠ ${t('success.kill.btn', 'Destroy now')}</button>
-      <p id="killStatus" class="status" role="status"></p>
+      <p id="killStatus" class="status" role="status" aria-live="polite"></p>
     </section>
   `;
 

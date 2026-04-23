@@ -21,6 +21,7 @@ function route() {
   } else {
     renderCompose(mount);
   }
+  setTimeout(() => document.querySelector('#app h1')?.focus({ preventScroll: false }), 0);
 }
 
 boot();

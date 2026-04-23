@@ -8,12 +8,12 @@ export function renderCompose(root) {
   root.innerHTML = `
     <section class="compose">
       <header>
-        <h1>🔥 burn.note</h1>
+        <h1 tabindex="-1">🔥 burn.note</h1>
         <p class="tag">${t('compose.tag', 'one-time notes, zero metadata')}</p>
       </header>
       <textarea id="msg" rows="10" placeholder="${t('compose.placeholder', 'Write your message…')}" autocomplete="off" spellcheck="false"></textarea>
       <div class="toolbar">
-        <button id="mask" type="button">👁 Hide</button>
+        <button id="mask" type="button" aria-label="Toggle masking">👁 Hide</button>
         <label class="codeModeLabel"><input type="checkbox" id="codeMode"> &lt;/&gt; Code mode</label>
       </div>
       <div class="row">
@@ -35,7 +35,7 @@ export function renderCompose(root) {
         <div id="pwBar" class="pwBar"></div>
       </div>
       <button id="send" type="button">${t('compose.submit', 'Create note')}</button>
-      <p id="status" class="status" role="status"></p>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
     </section>
   `;
 

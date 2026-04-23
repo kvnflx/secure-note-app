@@ -10,7 +10,7 @@ export function renderReveal(root, id) {
     : '';
   root.innerHTML = `
     <section class="reveal">
-      <h1>🔥 ${t('reveal.title', 'A note is waiting for you')}</h1>
+      <h1 tabindex="-1">🔥 ${t('reveal.title', 'A note is waiting for you')}</h1>
       <p>${t('reveal.warn', 'Once you click “Show note”, it will be decrypted, shown once, and then destroyed forever.')}</p>
       <ul>
         <li>${t('reveal.tip1', 'Make sure you are ready to read it now')}</li>
@@ -18,8 +18,8 @@ export function renderReveal(root, id) {
       </ul>
       ${passwordSection}
       <button id="show" type="button">👁 ${t('reveal.show', 'Show note')}</button>
-      <p id="status" class="status" role="status"></p>
-      <div class="toolbar" id="revealToolbar" hidden><button id="maskReveal" type="button">👁 Hide</button></div>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+      <div class="toolbar" id="revealToolbar" hidden><button id="maskReveal" type="button" aria-label="Toggle masking">👁 Hide</button></div>
       <div id="content" class="content" hidden></div>
     </section>
   `;
