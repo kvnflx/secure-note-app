@@ -1,3 +1,5 @@
+import { icons } from './icons.js';
+
 const KEY = 'bn-theme';
 
 export function initTheme() {
@@ -17,5 +19,7 @@ function apply(mode) {
   const dark = mode === 'dark' || (mode === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
   document.documentElement.dataset.theme = dark ? 'dark' : 'light';
   const btn = document.getElementById('theme-toggle');
-  if (btn) btn.textContent = mode === 'dark' ? '🌙' : mode === 'light' ? '☀' : '🌓';
+  if (!btn) return;
+  btn.innerHTML = mode === 'dark' ? icons.moon() : mode === 'light' ? icons.sun() : icons.auto();
+  btn.title = `Theme: ${mode}`;
 }

@@ -3,8 +3,14 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>One-Time Note</title>
-    <meta name="theme-color" content="#111">
+    <title>Burn Note — One-time encrypted messages</title>
+    <meta name="description" content="End-to-end encrypted one-time messages. Destroyed after reading. Zero metadata. Open-source.">
+    <meta name="theme-color" content="#0F4C96" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0A0E1A" media="(prefers-color-scheme: dark)">
+    <meta name="color-scheme" content="light dark">
+    <meta property="og:title" content="Burn Note">
+    <meta property="og:description" content="End-to-end encrypted one-time messages. Destroyed after reading. Zero metadata.">
+    <meta property="og:type" content="website">
     <link rel="stylesheet" href="/app.css">
     <link rel="manifest" href="/manifest.webmanifest">
     <script>
@@ -19,9 +25,14 @@
   <body>
     <a href="#app" class="skip-link">Skip to content</a>
     <header class="global">
-      <button id="theme-toggle" type="button" aria-label="Toggle theme">🌓</button>
+      <a href="/" class="brand" aria-label="Burn Note home">Burn Note</a>
+      <button id="theme-toggle" class="icon-only" type="button" aria-label="Toggle theme"></button>
     </header>
     <main id="app"></main>
+    <footer class="global">
+      <span>End-to-end encrypted · Zero metadata</span>
+      <span><a href="https://github.com/kvnflx/burn-note" rel="noopener noreferrer">Source</a></span>
+    </footer>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

@@ -1,48 +1,71 @@
 import { killNote } from '../api/client.js';
 import { t } from '../ui/i18n.js';
+import { icons } from '../ui/icons.js';
 
 export function renderSuccess(root, data) {
   const expiry = new Date(data.expiresAt * 1000).toLocaleString();
   root.innerHTML = `
     <section class="success">
-      <h1 tabindex="-1">✓ ${t('success.title', 'Note created')}</h1>
-      <p>${t('success.intro', 'Share this link:')}</p>
-      <div class="row">
-        <input id="link" type="text" readonly value="${escape(data.url)}">
-        <button id="copy">${t('success.copy', 'Copy')}</button>
-        <button id="share">📤 Share…</button>
+      <h1 tabindex="-1">${t('success.title', 'Note ready to share')}</h1>
+      <p class="lede">${t('success.lede', 'Copy the link and send it to the recipient. It will be destroyed the moment they open it.')}</p>
+
+      <div class="link-display">
+        <input id="link" type="text" readonly value="${escape(data.url)}" aria-label="${t('success.linkLabel', 'Share link')}">
+        <button id="copy" type="button">
+          ${icons.copy()}<span>${t('success.copy', 'Copy')}</span>
+        </button>
       </div>
-      <p class="status">${t('success.expiry', 'Expires at')} ${expiry}</p>
-      <details class="qrDetails">
-        <summary>📱 Show QR</summary>
+
+      <div class="row">
+        <button id="share" type="button" class="btn-secondary">
+          ${icons.share()}<span>${t('success.share', 'Share…')}</span>
+        </button>
+      </div>
+
+      <div class="meta">
+        <span class="meta-item">${icons.clock()} ${t('success.expiry', 'Expires')} ${expiry}</span>
+      </div>
+
+      <details class="qr-wrapper">
+        <summary>${icons.qr()} ${t('success.qr', 'Show QR code')}</summary>
         <div id="qr" class="qr"></div>
       </details>
+
       <hr>
-      <h2>${t('success.kill.title', 'Kill switch')}</h2>
-      <p>${t('success.kill.hint', 'You can destroy this note manually at any time:')}</p>
-      <button id="kill" class="danger">⚠ ${t('success.kill.btn', 'Destroy now')}</button>
+
+      <h2>${t('success.kill.title', 'Destroy now')}</h2>
+      <p>${t('success.kill.hint', 'If you change your mind, you can burn the note before it is read.')}</p>
+      <button id="kill" type="button" class="danger">
+        ${icons.trash()}<span>${t('success.kill.btn', 'Destroy this note')}</span>
+      </button>
       <p id="killStatus" class="status" role="status" aria-live="polite"></p>
     </section>
   `;
 
-  root.querySelector('#copy').addEventListener('click', async () => {
+  const copyBtn = root.querySelector('#copy');
+  const killBtn = root.querySelector('#kill');
+  const killStatus = root.querySelector('#killStatus');
+
+  copyBtn.addEventListener('click', async () => {
     await navigator.clipboard.writeText(data.url);
-    const btn = root.querySelector('#copy');
-    btn.textContent = '✓ ' + t('success.copied', 'Copied') + ' (auto-clear 30s)';
+    copyBtn.innerHTML = `${icons.check()}<span>${t('success.copied', 'Copied')}</span>`;
     setTimeout(async () => {
       try { await navigator.clipboard.writeText(''); } catch {}
-      btn.textContent = t('success.copy', 'Copy');
+      copyBtn.innerHTML = `${icons.copy()}<span>${t('success.copy', 'Copy')}</span>`;
     }, 30_000);
   });
 
-  root.querySelector('#kill').addEventListener('click', async () => {
-    if (!confirm(t('success.kill.confirm', 'Really destroy this note?'))) return;
+  killBtn.addEventListener('click', async () => {
+    if (!confirm(t('success.kill.confirm', 'Destroy this note? This cannot be undone.'))) return;
     try {
       await killNote(data.id, data.kill);
-      root.querySelector('#killStatus').textContent = '🔥 ' + t('success.killed', 'Destroyed.');
+      killStatus.className = 'status ok';
+      killStatus.textContent = t('success.killed', 'Destroyed. The link is now inactive.');
+      killBtn.disabled = true;
     } catch (e) {
       const { formatError } = await import('../ui/errors.js');
-      root.querySelector('#killStatus').textContent = '❌ ' + formatError(e);
+      killStatus.className = 'status error';
+      killStatus.textContent = formatError(e);
     }
   });
 

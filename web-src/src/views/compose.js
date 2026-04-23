@@ -3,38 +3,56 @@ import { deriveKey, randomSalt } from '../crypto/kdf.js';
 import { solvePOW } from '../pow/client.js';
 import { createNote } from '../api/client.js';
 import { t } from '../ui/i18n.js';
+import { icons } from '../ui/icons.js';
 
 export function renderCompose(root) {
   root.innerHTML = `
     <section class="compose">
-      <header>
-        <h1 tabindex="-1">🔥 burn.note</h1>
-        <p class="tag">${t('compose.tag', 'one-time notes, zero metadata')}</p>
-      </header>
-      <textarea id="msg" rows="10" placeholder="${t('compose.placeholder', 'Write your message…')}" autocomplete="off" spellcheck="false"></textarea>
+      <h1 tabindex="-1">${t('compose.title', 'Write a one-time note')}</h1>
+      <p class="lede">${t('compose.lede', 'The note is encrypted in your browser, stored briefly on the server, and destroyed the moment it is read.')}</p>
+
+      <label for="msg" class="sr-only">Message</label>
+      <textarea
+        id="msg"
+        rows="10"
+        placeholder="${t('compose.placeholder', 'Type your message here. It will never reach the server in plain text.')}"
+        autocomplete="off"
+        spellcheck="false"
+      ></textarea>
+
       <div class="toolbar">
-        <button id="mask" type="button" aria-label="Toggle masking">👁 Hide</button>
-        <label class="codeModeLabel"><input type="checkbox" id="codeMode"> &lt;/&gt; Code mode</label>
+        <button id="mask" type="button" class="btn-secondary sm" aria-label="${t('compose.mask', 'Toggle visibility')}">
+          ${icons.eyeOff()}<span class="label">${t('compose.mask.hide', 'Hide')}</span>
+        </button>
+        <label><input type="checkbox" id="codeMode"> ${t('compose.codeMode', 'Code mode')}</label>
       </div>
+
       <div class="row">
-        <label>${t('compose.expiry', 'Expiry')}
+        <label for="expiry">${t('compose.expiry', 'Expires after')}
           <select id="expiry">
-            <option value="300">5 min</option>
-            <option value="3600" selected>1 h</option>
-            <option value="86400">1 d</option>
-            <option value="604800">7 d</option>
-            <option value="2592000">30 d</option>
+            <option value="300">5 minutes</option>
+            <option value="3600" selected>1 hour</option>
+            <option value="86400">1 day</option>
+            <option value="604800">7 days</option>
+            <option value="2592000">30 days</option>
           </select>
         </label>
       </div>
+
       <div class="row">
-        <label><input type="checkbox" id="pwToggle"> ${t('compose.password', 'Additional password')}</label>
+        <label><input type="checkbox" id="pwToggle"> ${t('compose.password', 'Require a password to read')}</label>
       </div>
       <div id="pwArea" hidden>
-        <input type="password" id="pw" placeholder="${t('compose.pwPlaceholder', 'Password')}">
-        <div id="pwBar" class="pwBar"></div>
+        <input type="password" id="pw" placeholder="${t('compose.pwPlaceholder', 'Password')}" autocomplete="new-password">
+        <div id="pwBar" class="pw-strength" data-level="empty">
+          <div class="bar" aria-hidden="true"></div>
+          <span class="pw-label">&nbsp;</span>
+        </div>
       </div>
-      <button id="send" type="button">${t('compose.submit', 'Create note')}</button>
+
+      <div class="cta">
+        <button id="send" type="button">${t('compose.submit', 'Create note')}</button>
+      </div>
       <p id="status" class="status" role="status" aria-live="polite"></p>
     </section>
   `;
@@ -55,11 +73,23 @@ export function renderCompose(root) {
     updateBar();
   });
   pw.addEventListener('input', updateBar);
+
   function updateBar() {
     import('../ui/strength.js').then(({ strength }) => {
       const s = strength(pw.value);
       pwBar.dataset.level = s.label;
-      pwBar.textContent = `${s.label} (~${s.bits} bits)`;
+      const labelEl = pwBar.querySelector('.pw-label');
+      if (!pw.value) {
+        labelEl.textContent = '';
+      } else {
+        const labels = {
+          weak: t('strength.weak', 'Weak'),
+          ok: t('strength.ok', 'Acceptable'),
+          strong: t('strength.strong', 'Strong'),
+          too_common: t('strength.too_common', 'Too common'),
+        };
+        labelEl.textContent = `${labels[s.label] || s.label} · ~${s.bits} bits`;
+      }
     });
   }
 
@@ -72,7 +102,8 @@ async function submit(ta, sel, btn, status, pwToggle, pwInput, codeMode) {
   if (!text) return;
   const plaintext = codeMode?.checked ? '```\n' + text + '\n```' : text;
   btn.disabled = true;
-  status.textContent = '🔒 Encrypting…';
+  status.className = 'status';
+  status.textContent = t('compose.encrypting', 'Encrypting…');
   try {
     await ready();
     const payloadKey = randomKey();
@@ -88,9 +119,9 @@ async function submit(ta, sel, btn, status, pwToggle, pwInput, codeMode) {
       hasPassword = true;
     }
 
-    status.textContent = '⛏ Solving proof-of-work…';
+    status.textContent = t('compose.pow', 'Verifying proof of work…');
     const pow = await solvePOW();
-    status.textContent = '📤 Submitting…';
+    status.textContent = t('compose.submitting', 'Submitting…');
     const resp = await createNote({
       ciphertext: toB64(ct),
       expires_in: parseInt(sel.value, 10),
@@ -103,7 +134,8 @@ async function submit(ta, sel, btn, status, pwToggle, pwInput, codeMode) {
     renderSuccess(document.getElementById('app'), { url, kill: resp.kill_token, expiresAt: resp.expires_at, id: resp.id });
   } catch (e) {
     const { formatError } = await import('../ui/errors.js');
-    status.textContent = '❌ ' + formatError(e);
+    status.className = 'status error';
+    status.textContent = formatError(e);
     btn.disabled = false;
   }
 }
