@@ -14,6 +14,7 @@ export function renderReveal(root, id) {
       </ul>
       <button id="show" type="button">👁 ${t('reveal.show', 'Show note')}</button>
       <p id="status" class="status" role="status"></p>
+      <div class="toolbar" id="revealToolbar" hidden><button id="maskReveal" type="button">👁 Hide</button></div>
       <div id="content" class="content" hidden></div>
     </section>
   `;
@@ -32,6 +33,9 @@ export function renderReveal(root, id) {
       const pt = decrypt(key, ct);
       content.textContent = new TextDecoder().decode(pt);
       content.hidden = false;
+      const toolbar = root.querySelector('#revealToolbar');
+      toolbar.hidden = false;
+      import('../ui/mask.js').then(m => m.attachMask(content, root.querySelector('#maskReveal')));
       status.textContent = '';
       btn.hidden = true;
     } catch (e) {

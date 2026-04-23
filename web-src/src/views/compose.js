@@ -11,6 +11,7 @@ export function renderCompose(root) {
         <p class="tag">${t('compose.tag', 'one-time notes, zero metadata')}</p>
       </header>
       <textarea id="msg" rows="10" placeholder="${t('compose.placeholder', 'Write your message…')}" autocomplete="off" spellcheck="false"></textarea>
+      <div class="toolbar"><button id="mask" type="button">👁 Hide</button></div>
       <div class="row">
         <label>${t('compose.expiry', 'Expiry')}
           <select id="expiry">
@@ -33,6 +34,7 @@ export function renderCompose(root) {
   const status = root.querySelector('#status');
 
   btn.addEventListener('click', () => submit(ta, sel, btn, status));
+  import('../ui/mask.js').then(m => m.attachMask(ta, root.querySelector('#mask')));
 }
 
 async function submit(ta, sel, btn, status) {

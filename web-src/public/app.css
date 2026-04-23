@@ -68,3 +68,5 @@ button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
 .status { min-height: 1.25rem; color: var(--muted); }
 .qrDetails summary { cursor: pointer; padding: 0.5rem 0; }
 .qr svg { max-width: 256px; height: auto; display: block; margin: 0.5rem 0; background: white; padding: 0.5rem; }
+.masked { -webkit-text-security: disc; text-security: disc; }
+.toolbar { display: flex; gap: 0.5rem; margin: 0.25rem 0; }
