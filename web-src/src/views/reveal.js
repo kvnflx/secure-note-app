@@ -56,6 +56,19 @@ export function renderReveal(root, id) {
         cd.querySelector('#extend').disabled = true;
       });
 
+      // Copy button with auto-clear
+      const copy = document.createElement('button');
+      copy.textContent = '📋 Copy';
+      copy.className = 'copy-plain';
+      copy.addEventListener('click', async () => {
+        await navigator.clipboard.writeText(content.textContent);
+        copy.textContent = '✓ Copied (auto-clear 30s)';
+        setTimeout(async () => {
+          try { await navigator.clipboard.writeText(''); } catch {}
+          copy.textContent = '📋 Copy';
+        }, 30_000);
+      });
+      content.parentNode.appendChild(copy);
       status.textContent = '';
       btn.hidden = true;
     } catch (e) {

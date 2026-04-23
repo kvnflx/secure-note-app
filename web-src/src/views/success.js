@@ -28,8 +28,11 @@ export function renderSuccess(root, data) {
   root.querySelector('#copy').addEventListener('click', async () => {
     await navigator.clipboard.writeText(data.url);
     const btn = root.querySelector('#copy');
-    btn.textContent = '✓ ' + t('success.copied', 'Copied');
-    setTimeout(() => (btn.textContent = t('success.copy', 'Copy')), 1500);
+    btn.textContent = '✓ ' + t('success.copied', 'Copied') + ' (auto-clear 30s)';
+    setTimeout(async () => {
+      try { await navigator.clipboard.writeText(''); } catch {}
+      btn.textContent = t('success.copy', 'Copy');
+    }, 30_000);
   });
 
   root.querySelector('#kill').addEventListener('click', async () => {

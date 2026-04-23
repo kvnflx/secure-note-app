@@ -72,3 +72,4 @@ button:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
 .toolbar { display: flex; gap: 0.5rem; margin: 0.25rem 0; }
 .countdown { display: flex; align-items: center; gap: 0.5rem; margin: 0.5rem 0; color: var(--muted); font-family: ui-monospace, Menlo, monospace; }
 .countdown button { padding: 0.25rem 0.5rem; font-size: 0.85rem; min-height: 32px; }
+.copy-plain { margin-top: 0.5rem; }
