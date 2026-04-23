@@ -1,351 +1,380 @@
-# Deploy burn-note on Synology DSM with Portainer + Cloudflared
+# Deploy burn-note on Synology DSM — **UI only, no SSH**
 
-This guide walks through deploying burn-note on a Synology NAS running
-**Container Manager** (or the older Docker package) with **Portainer** as the
-management UI, and exposes the app via **Cloudflared Tunnel** at
-`note.backsafe.de` — without touching your existing `it-space.cloud` tunnel.
+Everything below is done through **Synology DSM**, **Portainer (web UI)**, and
+the **Cloudflare dashboard**. No shell, no terminal, no package manager calls.
+
+Exposes `note.backsafe.de` via your existing Cloudflared tunnel without
+touching `it-space.cloud`.
 
 ## Prerequisites
 
-- Synology NAS with **Container Manager** package installed (DSM 7.2+)
-- Portainer running on the NAS (any version ≥ 2.19)
-- Cloudflared tunnel already running for `it-space.cloud` (confirmed by the
-  user)
-- `backsafe.de` (or whatever zone contains `note.backsafe.de`) — see
-  [Cloudflare zone requirement](#cloudflare-zone-requirement) below
-- A GitHub account with access to this private repo (to pull the image from
-  `ghcr.io/kvnflx/burn-note`)
+- Synology NAS with **Container Manager** package installed (Package Center
+  → search "Container Manager" → Install). DSM 7.2+ recommended.
+- Portainer CE already running on the NAS as a container (any version ≥ 2.19).
+- Existing Cloudflared tunnel already exposing `it-space.cloud` (confirmed).
+- `backsafe.de` is a Cloudflare-managed zone (nameservers at Cloudflare). If
+  not, see **[Zone requirement](#zone-requirement)** below.
 
 ## Architecture
 
 ```
- ┌─────────────────────────────────────────────────────────────────┐
- │                          Cloudflare Edge                         │
- │   note.backsafe.de ─┐                 ┌─ it-space.cloud          │
- │                     │                 │                          │
- └─────────────────────┼─────────────────┼──────────────────────────┘
-                       │ Tunnel (same or new)
-                       ▼
- ┌─────────────────────────────────────────────────────────────────┐
- │  Synology NAS                                                    │
- │                                                                  │
- │   ┌────────────────────┐                                         │
- │   │  cloudflared       │──────────┐                              │
- │   │  (existing)        │          │  HTTP (no TLS inside LAN)    │
- │   └────────────────────┘          ▼                              │
- │                         ┌─────────────────┐                      │
- │                         │  burn-note      │ :8080                │
- │                         │  (Go binary)    │                      │
- │                         └────────┬────────┘                      │
- │                                  │ unix socket                   │
- │                                  ▼                               │
- │                         ┌─────────────────┐                      │
- │                         │  burn-redis     │ (tmpfs, ephemeral)   │
- │                         └─────────────────┘                      │
- └─────────────────────────────────────────────────────────────────┘
+ Cloudflare Edge
+   note.backsafe.de ───┐                   it-space.cloud (untouched)
+                       │
+                       ▼ same tunnel, new public hostname
+ Synology NAS
+   cloudflared ──────► burn-note:8080 ─(unix socket)─► burn-redis (tmpfs)
+        │               ↑
+        └── joins ──────┘  Docker network "cloudflared_net"
 ```
 
-No Caddy on the NAS — Cloudflared terminates TLS at the edge, and we keep
-the inside plain HTTP. Security headers are added at the Cloudflare Transform
-Rules layer (see step 6 below).
+No Caddy on the NAS — Cloudflare terminates TLS at the edge. Security headers
+are added via Cloudflare Transform Rules (step 7 below).
 
-## Cloudflare zone requirement
+---
 
-**Important:** for Cloudflared to route `note.backsafe.de`, the zone
-`backsafe.de` MUST be managed by Cloudflare (nameservers pointed at
-Cloudflare). Cloudflared is per-zone: the tunnel that serves
-`it-space.cloud` cannot create a DNS record in `backsafe.de` unless
-`backsafe.de` is also in your Cloudflare account.
+## Zone requirement
 
-Three scenarios:
+Cloudflared can only route hostnames whose zone (root domain) is in your
+Cloudflare account. Three possibilities:
 
-1. **`backsafe.de` already on Cloudflare** → everything below works as
-   written.
-2. **`backsafe.de` is elsewhere** (e.g., parked at Namecheap/Strato) →
-   you need to either:
-   - Transfer the zone to Cloudflare (free, takes a few hours) and then
-     follow this guide, or
-   - Use a subdomain of an existing Cloudflare zone instead (e.g.
-     `note.it-space.cloud` or `burn.it-space.cloud`). Technically fine;
-     just update the Caddyfile and this guide's hostname accordingly.
-3. **You don't want to transfer the zone** → use a free zone, e.g.
-   `burn.it-space.cloud`, and add a CNAME at your current DNS provider
-   pointing `note.backsafe.de` → `burn.it-space.cloud`. This works but
-   exposes the CNAME publicly. Not recommended for a privacy-focused app.
+| Situation | Action |
+|---|---|
+| `backsafe.de` already on Cloudflare | Follow the guide as written. |
+| `backsafe.de` at another DNS provider | **Either:** add `backsafe.de` to Cloudflare (free, ~2 h) and change nameservers → then follow guide. **Or:** use a subdomain under `it-space.cloud` (e.g. `burn.it-space.cloud`) — just substitute the hostname in every step below. |
+| You don't want to move `backsafe.de` | Use `burn.it-space.cloud` and, optionally, set a CNAME at your current provider: `note.backsafe.de` → `burn.it-space.cloud`. Works, but the CNAME is publicly resolvable (less privacy). |
 
-I'll assume scenario 1 going forward.
+I assume `backsafe.de` is on Cloudflare below.
 
-## Step 1 — Build and publish the image
+---
 
-The repo ships a GitHub Actions release workflow that builds a multi-arch
-(amd64 + arm64) Docker image on every `v*` tag push. The initial build is
-triggered by pushing `v0.1.0-rc1` (already done during setup).
+## Step 1 — Make the GHCR image pullable
 
-**Verify the image is on GHCR:**
+The image is published to GitHub Container Registry at
+`ghcr.io/kvnflx/burn-note`. By default the package inherits the repo's
+privacy (private). Two options.
 
-```bash
-# From any machine with gh + docker installed
-gh api /user/packages/container/burn-note/versions --jq '.[0:3]' | jq .
-docker pull ghcr.io/kvnflx/burn-note:latest
-```
+### Option A — Make the image public (recommended, doesn't affect source code)
 
-If the release workflow is still running or failed, check the Actions tab of
-the repo at https://github.com/kvnflx/burn-note/actions. Re-run failed jobs
-from there.
+1. Browser: https://github.com/kvnflx?tab=packages
+2. Click the **burn-note** package.
+3. Right column → **Package settings** → scroll down → **Danger Zone** →
+   **Change visibility** → **Public** → type the package name → **I
+   understand, change visibility**.
+4. Done. The source code repo stays private.
 
-**If the package is private (default for a private repo):**
+### Option B — Keep private, add a registry credential in Portainer
 
-Synology's Portainer needs a registry credential. Two options:
+1. On GitHub: top-right avatar → **Settings** → **Developer settings** →
+   **Personal access tokens** → **Tokens (classic)** → **Generate new token
+   (classic)**. Scope: `read:packages`. Copy the token.
+2. In Portainer: left nav → **Registries** → **Add registry**.
+3. Custom registry:
+   - Name: `GHCR`
+   - Registry URL: `ghcr.io`
+   - Username: `kvnflx`
+   - Password: the token you just created
+4. Save. You will pick this registry when creating the stack in Step 4.
 
-- **Option A (recommended):** make the image public. From the package page
-  (`https://github.com/kvnflx?tab=packages`), click the `burn-note` package,
-  then Package settings → Change visibility → Public. This does **not** make
-  the source code public — only the pre-built image.
-- **Option B:** keep private, add a GHCR Personal Access Token to Portainer
-  under Registries → Add registry → Custom → `ghcr.io`. Use your GitHub
-  username (`kvnflx`) and a PAT with `read:packages` scope.
+---
 
-## Step 2 — Prepare the NAS
+## Step 2 — Wait for the image to finish building
 
-1. Via SSH into the NAS (as a user in the `administrators` group):
+First-time build is triggered by the `v0.1.0-rc1` git tag push. Check at
+https://github.com/kvnflx/burn-note/actions. When the **Release** workflow
+shows a green checkmark, the image tags `0.1.0-rc1` and `latest` are
+available.
 
-   ```bash
-   sudo synouser --setpw admin <newpassword>   # if you haven't yet
-   ssh admin@<nas-ip>
+Typical build time: 5–8 minutes (multi-arch: amd64 + arm64 + cosign).
+
+---
+
+## Step 3 — Create the shared Docker network (in Portainer)
+
+Needed so that Cloudflared and the new burn-note container can find each
+other by name.
+
+1. Portainer → left nav → **Networks** → **+ Add network**.
+2. Fill in:
+   - **Name:** `cloudflared_net`
+   - **Driver:** `bridge`
+   - Leave all other fields at default (no manual IPv4/IPv6 ranges).
+3. Click **Create the network**.
+
+You should now see `cloudflared_net` in the networks list.
+
+---
+
+## Step 4 — Deploy the burn-note stack
+
+1. Portainer → **Stacks** → **+ Add stack**.
+2. **Name:** `burn-note`.
+3. **Build method:** **Web editor** (the default).
+4. Paste the entire contents of the file
+   [`deploy/docker-compose.synology.yml`](../deploy/docker-compose.synology.yml)
+   from the repo into the editor. (You can also open it at
+   https://github.com/kvnflx/burn-note/blob/main/deploy/docker-compose.synology.yml →
+   click **Raw** → copy-all.)
+5. **Environment variables:** leave empty (all needed vars are already in the
+   compose file).
+6. **Access control:** at your discretion. "Administrators" is fine.
+7. Click **Deploy the stack**.
+
+**If Option B (private image):** Portainer will prompt you to pick the GHCR
+registry created in Step 1B. Select it, confirm, and the pull proceeds.
+
+Portainer now pulls the image (first time: ~30 MB) and brings up two
+containers:
+- `burn-note` — the Go binary, listening on 8080 inside the shared network
+- `burn-redis` — ephemeral Redis on tmpfs, unix-socket only
+
+In the Stacks list, the `burn-note` stack should show 2/2 running and green.
+
+### Verify without SSH
+
+1. Portainer → **Containers** → click **burn-redis**.
+2. Scroll to **Container status** → click **Logs**. You should see
+   `Ready to accept connections` within a second of startup. That means
+   Redis is up.
+3. Portainer → **Containers** → click **burn-redis** → **Console** →
+   keep defaults (`/bin/sh`) → **Connect**. Run:
+   ```sh
+   wget -qO- http://burn-note:8080/healthz
    ```
+   Expected output: `ok`. This proves the two containers can see each other
+   over `cloudflared_net`.
 
-2. Create the shared network that cloudflared and burn-note will use:
+   (`burn-note` itself is a distroless image, no shell, so we test from the
+   Redis container instead.)
 
-   ```bash
-   sudo docker network create cloudflared_net
+---
+
+## Step 5 — Attach the existing cloudflared container to `cloudflared_net`
+
+No container restart needed. Portainer handles it live.
+
+1. Portainer → **Containers**.
+2. Click the cloudflared container (its name usually contains `cloudflared`;
+   if you use cloudflare/cloudflared via Docker, it's typically just that).
+3. Scroll to **Connected networks** (sometimes labelled "Network settings").
+4. Dropdown → pick **`cloudflared_net`** → click **Join network**.
+5. The container now shows **2 networks** (its original one + `cloudflared_net`).
+
+### Verify cloudflared can reach burn-note
+
+1. Portainer → **Containers** → cloudflared → **Console** → `/bin/sh` (or
+   whatever shell is in the image) → **Connect**. If cloudflared image has
+   no shell either, skip this test — the next step (creating the Public
+   Hostname in Cloudflare) does a real lookup and will surface the
+   connectivity issue if any.
+2. If the shell works, run:
+   ```sh
+   wget -qO- http://burn-note:8080/healthz   # or: curl -s http://burn-note:8080/healthz
    ```
+   Expected: `ok`.
 
-   If cloudflared is already attached to a different network (e.g. `bridge`),
-   you can either:
-   - Leave the compose file's `cloudflared_net` definition as-is and move
-     cloudflared onto the new network (cleanest), OR
-   - Change the compose file's external network to the one cloudflared
-     already uses.
+---
 
-## Step 3 — Deploy the stack via Portainer
+## Step 6 — Add the public hostname in Cloudflare Zero Trust
 
-1. Open Portainer → **Stacks** → **Add stack**.
-2. Name: `burn-note`.
-3. Paste the contents of `deploy/docker-compose.synology.yml` from the repo.
-4. **Environment variables section:** no changes needed (all defaults are in
-   the compose file).
-5. Click **Deploy the stack**.
+This is the "only one tunnel" part: you add a second public hostname to the
+**existing** tunnel. `it-space.cloud` stays untouched.
 
-Portainer pulls the image and brings up two containers:
-- `burn-note` — the Go app, listening on `8080` inside the `cloudflared_net`
-- `burn-redis` — ephemeral Redis, unix-socket connection only, not exposed
+1. Browser: https://one.dash.cloudflare.com → select your account.
+2. Left nav → **Networks** → **Tunnels**.
+3. Click the tunnel currently serving `it-space.cloud` → **Configure**.
+4. Top tabs → **Public Hostname** → **Add a public hostname**.
+5. Fill in:
 
-Verify:
+   | Field | Value |
+   |---|---|
+   | Subdomain | `note` |
+   | Domain | `backsafe.de` *(must appear in the dropdown)* |
+   | Path | *(leave empty)* |
+   | Service Type | `HTTP` |
+   | URL | `burn-note:8080` |
 
-```bash
-sudo docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'
-# burn-note    Up (healthy)    8080/tcp
-# burn-redis   Up              -
-```
-
-Smoke test from the NAS itself:
-
-```bash
-sudo docker exec burn-note wget -qO- http://localhost:8080/healthz
-# → ok
-```
-
-## Step 4 — Attach cloudflared to `cloudflared_net`
-
-Find your cloudflared container:
-
-```bash
-sudo docker ps --filter 'name=cloudflared' --format '{{.Names}}'
-```
-
-Attach it to the shared network (doesn't restart the container):
-
-```bash
-sudo docker network connect cloudflared_net <cloudflared-container-name>
-```
-
-Verify cloudflared can resolve `burn-note`:
-
-```bash
-sudo docker exec <cloudflared-container-name> \
-  wget -qO- http://burn-note:8080/healthz
-# → ok
-```
-
-## Step 5 — Add the public hostname in Cloudflare Zero Trust
-
-The elegant part: **you don't create a second tunnel**. You add a second
-public hostname to the **same tunnel** that already serves `it-space.cloud`.
-
-1. Go to https://one.dash.cloudflare.com → **Networks** → **Tunnels**.
-2. Click your existing tunnel (the one serving `it-space.cloud`) →
-   **Configure** → **Public Hostname** tab.
-3. Click **Add a public hostname**.
-4. Fill in:
-   - **Subdomain:** `note`
-   - **Domain:** `backsafe.de` (must appear in the dropdown — that's the
-     "zone on Cloudflare" requirement)
-   - **Path:** (leave empty)
-   - **Service Type:** `HTTP`
-   - **URL:** `burn-note:8080`
-5. Expand **Additional application settings**:
-   - **HTTP Settings** → **HTTP Host Header:** leave empty (don't override)
-   - **TLS Settings** → **No TLS verify:** leave off (not used, it's HTTP)
-   - **Access** → keep default (no Access policy)
-6. Save.
+6. Expand **Additional application settings** → leave all defaults (no
+   Access policy, no overrides).
+7. Click **Save hostname**.
 
 Cloudflare automatically creates the orange-cloud DNS record
-`note.backsafe.de` → `<tunnel-uuid>.cfargotunnel.com`.
+`note.backsafe.de` → `<tunnel-uuid>.cfargotunnel.com`. Your other hostnames
+(`it-space.cloud` etc.) are not touched.
 
-Your `it-space.cloud` public hostnames are untouched.
+---
 
-## Step 6 — Add Transform Rules for security headers
+## Step 7 — Add security-header Transform Rules
 
-Because we dropped Caddy, we lose the CSP/HSTS/etc. headers. Add them via
-Cloudflare Transform Rules:
+Because there's no Caddy doing CSP/HSTS, we add them at Cloudflare's edge.
 
-1. In the Cloudflare dashboard for `backsafe.de`, go to **Rules** →
-   **Transform Rules** → **Modify Response Header** → **Create rule**.
-2. **Rule name:** `burn-note security headers`.
-3. **When incoming requests match:**
-   - Field: `Hostname`
-   - Operator: `equals`
-   - Value: `note.backsafe.de`
-4. **Then modify response headers:** add each of the following (one row per
-   header):
+1. Cloudflare dashboard → select the **`backsafe.de`** zone (not the account,
+   the zone).
+2. Left nav → **Rules** → **Transform Rules** → **Modify Response Header**
+   tab → **+ Create rule**.
+3. **Rule name:** `burn-note security headers`.
+4. Under **When incoming requests match**:
+   - Dropdown → **Custom filter expression** → **Edit expression**.
+   - Paste: `(http.host eq "note.backsafe.de")`
+   - Or use the UI builder: Field = `Hostname`, Operator = `equals`,
+     Value = `note.backsafe.de`.
+5. Under **Then**, add each of the following one by one (click **+ Add** for
+   each row):
 
-   | Header name | Operation | Value |
-   |-------------|-----------|-------|
-   | `Strict-Transport-Security` | Set | `max-age=31536000; includeSubDomains` |
-   | `Content-Security-Policy` | Set | `default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; worker-src 'self'` |
-   | `X-Content-Type-Options` | Set | `nosniff` |
-   | `X-Frame-Options` | Set | `DENY` |
-   | `Referrer-Policy` | Set | `no-referrer` |
-   | `Permissions-Policy` | Set | `geolocation=(), microphone=(), camera=(), payment=()` |
+   | Operation | Header name | Value |
+   |---|---|---|
+   | Set static | `Strict-Transport-Security` | `max-age=31536000; includeSubDomains` |
+   | Set static | `Content-Security-Policy` | `default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; worker-src 'self'` |
+   | Set static | `X-Content-Type-Options` | `nosniff` |
+   | Set static | `X-Frame-Options` | `DENY` |
+   | Set static | `Referrer-Policy` | `no-referrer` |
+   | Set static | `Permissions-Policy` | `geolocation=(), microphone=(), camera=(), payment=()` |
 
-5. Deploy.
+6. Click **Deploy**.
 
-Optional but recommended: under the `backsafe.de` zone → **SSL/TLS** →
-**Overview**, set to **Full (strict)** (not just Flexible — Flexible would
-allow plaintext from CF to origin, which defeats the tunnel's TLS).
-Actually, Cloudflared tunnels use an outbound connection from the NAS to
-Cloudflare, so the SSL mode setting is less impactful, but **Full** is still
-the right default.
+### SSL/TLS sanity check
 
-## Step 7 — Verify end-to-end
+1. Cloudflare dashboard → `backsafe.de` zone → **SSL/TLS** → **Overview**.
+2. Recommend setting to **Full** (not **Flexible**).
+3. (Cloudflared tunnels are outbound from your NAS to Cloudflare and don't
+   use this setting directly, but **Full** is the right default zone-wide.)
 
-```bash
-curl -sI https://note.backsafe.de/healthz
-# HTTP/2 200
-# strict-transport-security: max-age=31536000; includeSubDomains
-# content-security-policy: default-src 'self'; ...
+---
 
-curl -s https://note.backsafe.de/healthz
-# ok
-```
+## Step 8 — End-to-end verification
 
-Open `https://note.backsafe.de` in a browser. Create a note, copy the
-returned `/n/<id>#k=...` URL, open it in a private window, click
-"Show note" — should decrypt and display. Reload → "already gone".
+### From a browser
 
-Your `it-space.cloud` app should be completely unaffected — browse to any
-of its public hostnames to sanity-check.
+1. Open https://note.backsafe.de in an incognito/private window.
+2. You should see the compose view ("🔥 burn.note", textarea, "Create note").
+3. Type a message → **Create note** → wait (~1 sec for PoW) → you get a
+   success screen with the URL.
+4. Copy the URL → open in a **different** incognito window → click
+   **Show note**. The message decrypts and displays.
+5. Reload that second window → click **Show note** → should show "already
+   gone / bereits verbraucht". ✅ Burn semantics confirmed.
 
-## Step 8 — Set up auto-update (optional)
+### Verify security headers (also browser)
 
-The image tag in the compose file is `:latest`, so a `docker compose pull`
-followed by `docker compose up -d` fetches the newest build. You can wire
-this into:
+1. DevTools (F12) → **Network** tab.
+2. Reload https://note.backsafe.de.
+3. Click the document request → **Headers** tab → **Response Headers**.
+4. Confirm you see:
+   - `strict-transport-security: max-age=31536000; includeSubDomains`
+   - `content-security-policy: default-src 'self'; ...`
+   - `x-content-type-options: nosniff`
+   - `x-frame-options: DENY`
+   - `referrer-policy: no-referrer`
 
-- **Watchtower** (another container, lightweight, auto-pulls on a schedule)
-- **Portainer's built-in stack re-deploy webhook** — each stack gets a
-  webhook URL that, when called, re-pulls and redeploys. Combine with a
-  GitHub Action on release to call the webhook.
+### Verify it-space.cloud still works
 
-For the first few weeks I recommend manual updates — watch the release notes
-on GitHub for any migration steps.
+Open any of your existing `it-space.cloud` hostnames — everything should be
+unchanged.
 
-## Step 9 — Health monitoring
+---
 
-Set up an external monitor (UptimeRobot, Kuma, Ohdear, etc.) pointing at
-`https://note.backsafe.de/healthz`. Alert on non-200 for more than 5 min.
+## Step 9 — Auto-update (optional)
+
+The compose file uses `image: ghcr.io/kvnflx/burn-note:latest`. To pull new
+versions after a future release:
+
+### Manual, via Portainer (recommended for first few updates)
+
+1. Portainer → **Stacks** → **burn-note**.
+2. Click **Editor** → do NOT change anything → click **Update the stack**.
+3. Check **Re-pull image and redeploy** → **Update**.
+
+### Automated, via Watchtower container
+
+1. Portainer → **Stacks** → **+ Add stack** → name `watchtower`.
+2. Web editor:
+   ```yaml
+   services:
+     watchtower:
+       image: containrrr/watchtower
+       restart: always
+       volumes:
+         - /var/run/docker.sock:/var/run/docker.sock
+       environment:
+         WATCHTOWER_POLL_INTERVAL: "86400"  # once a day
+         WATCHTOWER_LABEL_ENABLE: "true"
+         WATCHTOWER_CLEANUP: "true"
+   ```
+3. Add `labels: { com.centurylinklabs.watchtower.enable: "true" }` to the
+   `burn` service in the burn-note stack (open its editor, paste, redeploy).
+
+---
+
+## Step 10 — Health monitoring
+
+Set up **UptimeRobot** (or similar) to monitor
+`https://note.backsafe.de/healthz` at 5-min intervals. Alert on non-200.
+
+---
 
 ## Troubleshooting
 
-### cloudflared can't reach `burn-note:8080`
+### Portainer → Stacks → burn-note shows "1/2 running"
 
-Check the network:
+Click the failed container → **Logs**. Common causes:
+- Wrong image name / image private without credential → pull error in logs
+- `cloudflared_net` doesn't exist → Stack deploy fails early; re-do Step 3
+- Redis socket not writable → check that both containers list `sockets`
+  volume in their mounts
 
-```bash
-sudo docker inspect <cloudflared-container> \
-  | grep -A2 cloudflared_net
-sudo docker inspect burn-note \
-  | grep -A2 cloudflared_net
-```
+### Cloudflare shows "502 Bad Gateway" at https://note.backsafe.de
 
-Both containers must be attached to the same user-defined bridge network
-(Docker's internal DNS only resolves container names on user-defined
-networks, not on the default `bridge`).
+The tunnel is up but can't reach `burn-note:8080`. Check:
 
-### 502 Bad Gateway from Cloudflare
+1. Portainer → Containers → `burn-note` → **is it running and healthy?**
+2. Portainer → Containers → cloudflared → **Connected networks** — does it
+   include `cloudflared_net`? If not, re-do Step 5.
+3. Portainer → Containers → `burn-redis` → **Console** → `/bin/sh` →
+   `wget -qO- http://burn-note:8080/healthz` should print `ok`.
 
-Cloudflared is reaching the NAS but the upstream is dropping the request.
-Check burn logs in Portainer:
+### Cloudflare shows "Error 1033 - Argo Tunnel error"
 
-```bash
-sudo docker logs burn-note --tail 50
-```
+Your cloudflared container is not connected to the tunnel anymore. In
+Portainer check its **Logs**: you should see `Connection registered` /
+`Registered tunnel connection`. If not, restart the container via Portainer:
+container → **Restart**. As a last resort, run `cloudflared tunnel run` with
+the same token from the UI-driven tunnel settings.
 
-Look for "redis: ..." errors — Redis unix socket may be unreachable from
-the `burn-note` container. Verify the volume mount:
+### "unauthorized: authentication required" when pulling the image
 
-```bash
-sudo docker exec burn-note ls -la /sockets/
-# srw-rw---- 1 999 999 0 ... redis.sock
-```
+You chose Option B (private image) but either the PAT is wrong, expired, or
+lacks `read:packages`. Regenerate PAT → update registry credential in
+Portainer → redeploy stack.
 
-### Image pull fails: unauthorized
+### Notes disappear after NAS reboot or container restart
 
-The image is private. See Step 1 — either make it public or add a GHCR
-registry credential in Portainer.
+Feature, not bug. Redis is on tmpfs. See
+[THREAT-MODEL.md](THREAT-MODEL.md).
 
 ### Redis OOM
 
 Bump `maxmemory` in the compose command section. Default 256 MB handles
-~10 000 small notes live at once. If you're hosting for many users, raise
-it; if you're self-hosting for yourself, leave it.
+~10 000 small notes concurrently. Redeploy the stack.
 
-### Notes disappear after NAS reboot
+### PoW too slow on weak clients (low-end mobile)
 
-Feature, not bug. Redis is on `tmpfs`. See
-[docs/THREAT-MODEL.md](THREAT-MODEL.md).
+Lower `BURN_POW_DIFFICULTY` in the `burn` service env (e.g., `18`), redeploy.
+Trade-off: spam resistance weakens. Minimum recommended: 16.
 
-### Let's Encrypt rate limits
+---
 
-Not applicable here — Cloudflare handles TLS termination at the edge. No
-Let's Encrypt certs are involved on your NAS.
+## What you deliberately don't have on the NAS
 
-## What's NOT deployed here
+- No Caddy, no Let's Encrypt — Cloudflare terminates TLS.
+- No Tor hidden service — can be added as a fourth container later.
+- No database backups — intentional; see [THREAT-MODEL.md](THREAT-MODEL.md).
+- No persistent storage at all — `/data` in Redis is tmpfs.
 
-- **No Caddy.** Pros: simpler, fewer moving parts on the NAS. Cons:
-  if Cloudflared is ever unreachable for you (tunnel down, CF outage), the
-  app is offline — no local HTTPS fallback. If this matters, use the default
-  `deploy/docker-compose.yml` and accept the Let's Encrypt dance.
-- **No Tor hidden service.** Can be added as a fourth container later;
-  see the side-car pattern in `HOSTING.md`.
-- **No backups.** Intentional. See [THREAT-MODEL.md](THREAT-MODEL.md).
+## Cost
 
-## Cost summary
+- Synology NAS: sunk.
+- Cloudflare Tunnel + DNS: free.
+- GHCR private package storage: 500 MB free tier; ~30 MB image ≈ 16 revs.
+- Domain: whatever you already pay.
 
-- Synology NAS: sunk cost (you already own it)
-- Cloudflare Tunnel: free
-- Image hosting (GHCR for private images): 500 MB free tier; burn-note image
-  is ~30 MB, fits ~15× updates free
-- Domain `backsafe.de`: whatever you already pay
-
-So: **€0/month incremental** on top of your existing setup.
+**Incremental monthly cost: €0.**
