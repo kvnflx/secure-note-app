@@ -88,3 +88,16 @@ header.global {
   min-width: 44px;
   min-height: 44px;
 }
+.pwBar {
+  margin-top: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  background: var(--border);
+  color: var(--muted);
+}
+.pwBar[data-level="weak"] { background: #fecaca; color: #7f1d1d; }
+.pwBar[data-level="ok"] { background: #fde68a; color: #78350f; }
+.pwBar[data-level="strong"] { background: #bbf7d0; color: #14532d; }
+.pwBar[data-level="too_common"] { background: #fca5a5; color: #7f1d1d; }
+#pwArea input { width: 100%; }

@@ -1,4 +1,5 @@
 import { ready, randomKey, encrypt, toB64, toB64Url } from '../crypto/aead.js';
+import { deriveKey, randomSalt } from '../crypto/kdf.js';
 import { solvePOW } from '../pow/client.js';
 import { createNote } from '../api/client.js';
 import { t } from '../ui/i18n.js';
@@ -23,6 +24,13 @@ export function renderCompose(root) {
           </select>
         </label>
       </div>
+      <div class="row">
+        <label><input type="checkbox" id="pwToggle"> ${t('compose.password', 'Additional password')}</label>
+      </div>
+      <div id="pwArea" hidden>
+        <input type="password" id="pw" placeholder="${t('compose.pwPlaceholder', 'Password')}">
+        <div id="pwBar" class="pwBar"></div>
+      </div>
       <button id="send" type="button">${t('compose.submit', 'Create note')}</button>
       <p id="status" class="status" role="status"></p>
     </section>
@@ -32,30 +40,59 @@ export function renderCompose(root) {
   const sel = root.querySelector('#expiry');
   const btn = root.querySelector('#send');
   const status = root.querySelector('#status');
+  const pwToggle = root.querySelector('#pwToggle');
+  const pwArea = root.querySelector('#pwArea');
+  const pw = root.querySelector('#pw');
+  const pwBar = root.querySelector('#pwBar');
 
-  btn.addEventListener('click', () => submit(ta, sel, btn, status));
+  pwToggle.addEventListener('change', () => {
+    pwArea.hidden = !pwToggle.checked;
+    if (!pwToggle.checked) pw.value = '';
+    updateBar();
+  });
+  pw.addEventListener('input', updateBar);
+  function updateBar() {
+    import('../ui/strength.js').then(({ strength }) => {
+      const s = strength(pw.value);
+      pwBar.dataset.level = s.label;
+      pwBar.textContent = `${s.label} (~${s.bits} bits)`;
+    });
+  }
+
+  btn.addEventListener('click', () => submit(ta, sel, btn, status, pwToggle, pw));
   import('../ui/mask.js').then(m => m.attachMask(ta, root.querySelector('#mask')));
 }
 
-async function submit(ta, sel, btn, status) {
+async function submit(ta, sel, btn, status, pwToggle, pwInput) {
   const text = ta.value;
   if (!text) return;
   btn.disabled = true;
   status.textContent = '🔒 Encrypting…';
   try {
     await ready();
-    const key = randomKey();
-    const ct = encrypt(key, new TextEncoder().encode(text));
+    const payloadKey = randomKey();
+    const ct = encrypt(payloadKey, new TextEncoder().encode(text));
+
+    let fragment = `#k=${toB64Url(payloadKey)}`;
+    let hasPassword = false;
+    if (pwToggle.checked && pwInput.value) {
+      const salt = randomSalt();
+      const wrap = deriveKey(pwInput.value, salt);
+      const wrappedKey = encrypt(wrap, payloadKey);
+      fragment = `#k=${toB64Url(wrappedKey)}&s=${toB64Url(salt)}`;
+      hasPassword = true;
+    }
+
     status.textContent = '⛏ Solving proof-of-work…';
     const pow = await solvePOW();
     status.textContent = '📤 Submitting…';
     const resp = await createNote({
       ciphertext: toB64(ct),
       expires_in: parseInt(sel.value, 10),
-      has_password: false,
+      has_password: hasPassword,
       pow
     });
-    const url = `${location.origin}/n/${resp.id}#k=${toB64Url(key)}`;
+    const url = `${location.origin}/n/${resp.id}${fragment}`;
     history.pushState({ success: true, url, kill: resp.kill_token, expiresAt: resp.expires_at, id: resp.id }, '', '/success');
     const { renderSuccess } = await import('./success.js');
     renderSuccess(document.getElementById('app'), { url, kill: resp.kill_token, expiresAt: resp.expires_at, id: resp.id });
