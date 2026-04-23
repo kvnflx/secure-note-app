@@ -10,6 +10,7 @@ export function renderSuccess(root, data) {
       <div class="row">
         <input id="link" type="text" readonly value="${escape(data.url)}">
         <button id="copy">${t('success.copy', 'Copy')}</button>
+        <button id="share">📤 Share…</button>
       </div>
       <p class="status">${t('success.expiry', 'Expires at')} ${expiry}</p>
       <details class="qrDetails">
@@ -43,6 +44,10 @@ export function renderSuccess(root, data) {
 
   import('../ui/qr.js').then(m => {
     m.renderQR(root.querySelector('#qr'), data.url);
+  });
+
+  import('../ui/share.js').then(m => {
+    root.querySelector('#share').addEventListener('click', () => m.shareOrCopy(data.url));
   });
 }
 
