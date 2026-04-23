@@ -6,24 +6,24 @@ export function renderSuccess(root, data) {
   const expiry = new Date(data.expiresAt * 1000).toLocaleString();
   root.innerHTML = `
     <section class="success">
-      <h1 tabindex="-1">${t('success.title', 'Note ready to share')}</h1>
-      <p class="lede">${t('success.lede', 'Copy the link and send it to the recipient. It will be destroyed the moment they open it.')}</p>
+      <h1 tabindex="-1">${t('success.title', 'Note ready')}</h1>
+      <p class="lede">${t('success.lede', 'Share this link. It will be destroyed the moment it is opened.')}</p>
 
       <div class="link-display">
         <input id="link" type="text" readonly value="${escape(data.url)}" aria-label="${t('success.linkLabel', 'Share link')}">
-        <button id="copy" type="button">
+        <button id="copy" type="button" class="btn-secondary">
           ${icons.copy()}<span>${t('success.copy', 'Copy')}</span>
         </button>
       </div>
 
-      <div class="row">
-        <button id="share" type="button" class="btn-secondary">
-          ${icons.share()}<span>${t('success.share', 'Share…')}</span>
+      <div class="row" style="margin-top: var(--s-12);">
+        <button id="share" type="button" class="btn-secondary sm">
+          ${icons.share()}<span>${t('success.share', 'Share')}</span>
         </button>
       </div>
 
       <div class="meta">
-        <span class="meta-item">${icons.clock()} ${t('success.expiry', 'Expires')} ${expiry}</span>
+        <span class="meta-item">${icons.clock()} ${t('success.expiry', 'Expires')} <strong>${expiry}</strong></span>
       </div>
 
       <details class="qr-wrapper">

@@ -7,15 +7,15 @@ import { icons } from '../ui/icons.js';
 export function renderReveal(root, id) {
   const frag = parseFragment(location.hash);
   const passwordSection = frag.s
-    ? `<div class="row" style="flex-direction: column; align-items: stretch;">
-         <label for="pw">${t('reveal.pwLabel', 'Enter the password to continue')}</label>
+    ? `<div class="options" style="margin-top: var(--s-16);">
+         <div class="options-header">${t('reveal.pwLabel', 'Password required')}</div>
          <input id="pw" type="password" placeholder="${t('compose.pwPlaceholder', 'Password')}" autocomplete="off">
        </div>`
     : '';
 
   root.innerHTML = `
     <section class="reveal">
-      <h1 tabindex="-1">${t('reveal.title', 'A note is waiting for you')}</h1>
+      <h1 tabindex="-1">${t('reveal.title', 'Incoming note')}</h1>
       <p class="lede">${t('reveal.lede', 'Reading this note will destroy it. You can only see it once.')}</p>
 
       <ul class="tips">
@@ -33,8 +33,8 @@ export function renderReveal(root, id) {
       </div>
       <p id="status" class="status" role="status" aria-live="polite"></p>
 
-      <div class="toolbar" id="revealToolbar" hidden>
-        <button id="maskReveal" type="button" class="btn-secondary sm" aria-label="${t('compose.mask', 'Toggle visibility')}">
+      <div class="toolbar no-border" id="revealToolbar" hidden style="margin-top: var(--s-16);">
+        <button id="maskReveal" type="button" class="ghost sm" aria-label="${t('compose.mask', 'Toggle visibility')}">
           ${icons.eyeOff()}<span class="label">${t('compose.mask.hide', 'Hide')}</span>
         </button>
       </div>
@@ -73,13 +73,14 @@ export function renderReveal(root, id) {
       const ct = fromB64(resp.ciphertext);
       const pt = decrypt(key, ct);
 
-      // Inject countdown UI above content
+      // Inject countdown pill above content
       const cd = document.createElement('div');
       cd.className = 'countdown';
       cd.innerHTML = `
-        <span class="cd-label">${icons.clock()}<span>${t('reveal.destroysIn', 'Destroys in')}</span></span>
+        <span>${t('reveal.destroysIn', 'Destroys in')}</span>
         <span class="cd-value" id="cd">1:00</span>
-        <button id="extend" type="button" class="btn-secondary sm">+60s</button>
+        <span class="cd-sep"></span>
+        <button id="extend" type="button" class="ghost sm">+60s</button>
       `;
       content.parentNode.insertBefore(cd, content);
 
@@ -112,11 +113,19 @@ export function renderReveal(root, id) {
 
       let extended = false;
       const { startCountdown } = await import('../ui/countdown.js');
-      const ctl = startCountdown(cd.querySelector('#cd'), 60, () => {
+      const cdValueEl = cd.querySelector('#cd');
+      const ctl = startCountdown(cdValueEl, 60, () => {
         content.classList.add('expired');
         content.textContent = t('reveal.expired', 'This note no longer exists.');
         cd.remove();
       });
+      // Urgency indicator — watch value for <10s
+      const urgencyCheck = setInterval(() => {
+        const [m, s] = cdValueEl.textContent.split(':').map(Number);
+        const total = (m || 0) * 60 + (s || 0);
+        cd.dataset.urgent = total <= 10 ? '1' : '0';
+        if (total <= 0) clearInterval(urgencyCheck);
+      }, 500);
       cd.querySelector('#extend').addEventListener('click', () => {
         if (extended) return;
         extended = true;
@@ -124,10 +133,10 @@ export function renderReveal(root, id) {
         cd.querySelector('#extend').disabled = true;
       });
 
-      // Copy-plain button, positioned after content
+      // Copy-plain button after content
       const copy = document.createElement('button');
       copy.className = 'btn-secondary sm';
-      copy.style.marginTop = 'var(--space-3)';
+      copy.style.marginTop = 'var(--s-12)';
       copy.innerHTML = `${icons.copy()}<span>${t('success.copy', 'Copy')}</span>`;
       copy.addEventListener('click', async () => {
         await navigator.clipboard.writeText(content.textContent);

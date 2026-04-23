@@ -8,27 +8,30 @@ import { icons } from '../ui/icons.js';
 export function renderCompose(root) {
   root.innerHTML = `
     <section class="compose">
-      <h1 tabindex="-1">${t('compose.title', 'Write a one-time note')}</h1>
-      <p class="lede">${t('compose.lede', 'The note is encrypted in your browser, stored briefly on the server, and destroyed the moment it is read.')}</p>
+      <h1 tabindex="-1">${t('compose.title', 'New note')}</h1>
+      <p class="lede">${t('compose.lede', 'The note is encrypted in your browser, stored briefly, and destroyed the moment it is read.')}</p>
 
       <label for="msg" class="sr-only">Message</label>
       <textarea
         id="msg"
         rows="10"
-        placeholder="${t('compose.placeholder', 'Type your message here. It will never reach the server in plain text.')}"
+        placeholder="${t('compose.placeholder', 'Type your message here. It never reaches the server in plain text.')}"
         autocomplete="off"
         spellcheck="false"
       ></textarea>
 
       <div class="toolbar">
-        <button id="mask" type="button" class="btn-secondary sm" aria-label="${t('compose.mask', 'Toggle visibility')}">
+        <button id="mask" type="button" class="ghost sm" aria-label="${t('compose.mask', 'Toggle visibility')}">
           ${icons.eyeOff()}<span class="label">${t('compose.mask.hide', 'Hide')}</span>
         </button>
-        <label><input type="checkbox" id="codeMode"> ${t('compose.codeMode', 'Code mode')}</label>
+        <label class="checkbox-wrap"><input type="checkbox" id="codeMode"> ${t('compose.codeMode', 'Code mode')}</label>
       </div>
 
-      <div class="row">
-        <label for="expiry">${t('compose.expiry', 'Expires after')}
+      <div class="options">
+        <div class="options-header">${t('compose.options', 'Options')}</div>
+
+        <div class="options-row">
+          <label for="expiry">${t('compose.expiry', 'Expires after')}</label>
           <select id="expiry">
             <option value="300">5 minutes</option>
             <option value="3600" selected>1 hour</option>
@@ -36,17 +39,20 @@ export function renderCompose(root) {
             <option value="604800">7 days</option>
             <option value="2592000">30 days</option>
           </select>
-        </label>
-      </div>
+        </div>
 
-      <div class="row">
-        <label><input type="checkbox" id="pwToggle"> ${t('compose.password', 'Require a password to read')}</label>
-      </div>
-      <div id="pwArea" hidden>
-        <input type="password" id="pw" placeholder="${t('compose.pwPlaceholder', 'Password')}" autocomplete="new-password">
-        <div id="pwBar" class="pw-strength" data-level="empty">
-          <div class="bar" aria-hidden="true"></div>
-          <span class="pw-label">&nbsp;</span>
+        <div class="options-row">
+          <label for="pwToggle" class="checkbox-wrap">
+            <input type="checkbox" id="pwToggle">
+            ${t('compose.password', 'Require password')}
+          </label>
+        </div>
+        <div id="pwArea" class="options-sub" hidden>
+          <input type="password" id="pw" placeholder="${t('compose.pwPlaceholder', 'Password')}" autocomplete="new-password">
+          <div id="pwBar" class="pw-strength" data-level="empty">
+            <div class="bar" aria-hidden="true"></div>
+            <span class="pw-label">&nbsp;</span>
+          </div>
         </div>
       </div>
 

@@ -4,13 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Burn Note — One-time encrypted messages</title>
-  <meta name="description" content="End-to-end encrypted one-time messages. Destroyed after reading. Zero metadata.">
-  <meta name="theme-color" content="#0F4C96" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#0A0E1A" media="(prefers-color-scheme: dark)">
+  <meta name="description" content="End-to-end encrypted one-time notes. Destroyed the moment they are read. Zero metadata.">
+  <meta name="theme-color" content="#FAFAFA" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0A0A0A" media="(prefers-color-scheme: dark)">
   <meta name="color-scheme" content="light dark">
   <meta property="og:title" content="Burn Note">
   <meta property="og:description" content="Click to reveal — this note will be destroyed on read.">
   <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://rsms.me">
   <link rel="stylesheet" href="/app.css">
   <link rel="manifest" href="/manifest.webmanifest">
   <script>
@@ -25,12 +26,14 @@
   <a href="#app" class="skip-link">Skip to content</a>
   <header class="global">
     <a href="/" class="brand" aria-label="Burn Note home">Burn Note</a>
-    <button id="theme-toggle" class="icon-only" type="button" aria-label="Toggle theme"></button>
+    <nav class="nav-right" aria-label="Settings">
+      <button id="theme-toggle" class="icon-only" type="button" aria-label="Toggle theme"></button>
+    </nav>
   </header>
   <main id="app"></main>
   <footer class="global">
-    <span>End-to-end encrypted · Zero metadata</span>
-    <span><a href="https://github.com/kvnflx/burn-note" rel="noopener noreferrer">Source</a></span>
+    <span class="meta-inline">End-to-end encrypted · Zero metadata</span>
+    <a href="https://github.com/kvnflx/burn-note" rel="noopener noreferrer" target="_blank">Source</a>
   </footer>
   <script type="module" src="/assets/app.js"></script>
 </body>
