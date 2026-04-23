@@ -125,8 +125,13 @@ async function submit(ta, sel, btn, status, pwToggle, pwInput, codeMode) {
       hasPassword = true;
     }
 
-    status.textContent = t('compose.pow', 'Verifying proof of work…');
-    const pow = await solvePOW();
+    status.textContent = t('compose.pow', 'Computing proof of work…');
+    const powStart = performance.now();
+    const pow = await solvePOW((iter) => {
+      const elapsed = ((performance.now() - powStart) / 1000).toFixed(1);
+      const rate = Math.round(iter / Math.max(0.1, (performance.now() - powStart) / 1000) / 1000);
+      status.textContent = `${t('compose.pow', 'Computing proof of work…')} ${elapsed}s · ~${rate}k H/s`;
+    });
     status.textContent = t('compose.submitting', 'Submitting…');
     const resp = await createNote({
       ciphertext: toB64(ct),

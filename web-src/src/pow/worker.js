@@ -17,15 +17,16 @@ function leadingZeroBits(bytes) {
 }
 
 self.onmessage = async (e) => {
-  const { seed, difficulty } = e.data;
-  for (let i = 0; i < 1 << 30; i++) {
+  const { seed, difficulty, workerId = 0, workerCount = 1 } = e.data;
+  // Each worker walks its own slice of the nonce space.
+  for (let i = workerId; i < 1 << 30; i += workerCount) {
     const nonce = i.toString(36);
     const h = await sha256(seed + nonce);
     if (leadingZeroBits(h) >= difficulty) {
       self.postMessage({ nonce });
       return;
     }
-    if ((i & 0x3ff) === 0) self.postMessage({ progress: i });
+    if ((i & 0x3ff) === workerId) self.postMessage({ progress: i });
   }
   self.postMessage({ error: 'no nonce found' });
 };

@@ -1,22 +1,23 @@
 <!doctype html>
-<html lang="en">
+<html lang="de">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Burn Note — One-time encrypted messages</title>
-    <meta name="description" content="End-to-end encrypted one-time messages. Destroyed after reading. Zero metadata. Open-source.">
-    <meta name="theme-color" content="#0F4C96" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#0A0E1A" media="(prefers-color-scheme: dark)">
-    <meta name="color-scheme" content="light dark">
-    <meta property="og:title" content="Burn Note">
-    <meta property="og:description" content="End-to-end encrypted one-time messages. Destroyed after reading. Zero metadata.">
+    <title>Secure Note — Verschlüsselte Einmal-Nachrichten</title>
+    <meta name="description" content="Sende verschlüsselte Notizen, die sich nach dem Lesen selbst zerstören.">
+    <meta name="theme-color" content="#0A0A0A">
+    <meta name="color-scheme" content="dark light">
+    <meta property="og:title" content="Secure Note">
+    <meta property="og:description" content="Sende verschlüsselte Notizen, die sich nach dem Lesen selbst zerstören.">
     <meta property="og:type" content="website">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/logo.svg">
+    <link rel="preconnect" href="https://rsms.me">
     <link rel="stylesheet" href="/app.css">
     <link rel="manifest" href="/manifest.webmanifest">
     <script>
-      // Theme bootstrap to avoid FOUC.
       (function () {
-        var t = localStorage.getItem('bn-theme') || 'auto';
+        var t = localStorage.getItem('bn-theme') || 'dark';
         var d = t === 'dark' || (t === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
         document.documentElement.dataset.theme = d ? 'dark' : 'light';
       })();
@@ -25,13 +26,18 @@
   <body>
     <a href="#app" class="skip-link">Skip to content</a>
     <header class="global">
-      <a href="/" class="brand" aria-label="Burn Note home">Burn Note</a>
-      <button id="theme-toggle" class="icon-only" type="button" aria-label="Toggle theme"></button>
+      <a href="/" class="brand" aria-label="Secure Note home">
+        <img src="/logo.svg" alt="" width="24" height="24" class="brand-logo">
+        <span>Secure Note</span>
+      </a>
+      <nav class="nav-right" aria-label="Settings">
+        <button id="theme-toggle" class="icon-only" type="button" aria-label="Toggle theme"></button>
+      </nav>
     </header>
     <main id="app"></main>
     <footer class="global">
-      <span>End-to-end encrypted · Zero metadata</span>
-      <span><a href="https://github.com/kvnflx/burn-note" rel="noopener noreferrer">Source</a></span>
+      <span class="meta-inline">Ende-zu-Ende verschlüsselt · Zero metadata</span>
+      <a href="https://github.com/kvnflx/burn-note" rel="noopener noreferrer" target="_blank">Source</a>
     </footer>
     <script type="module" src="/src/main.js"></script>
   </body>

@@ -28,7 +28,7 @@ export function renderSuccess(root, data) {
 
       <details class="qr-wrapper">
         <summary>${icons.qr()} ${t('success.qr', 'Show QR code')}</summary>
-        <div id="qr" class="qr"></div>
+        <div class="qr"><div id="qr" class="qr-inner"></div></div>
       </details>
 
       <hr>

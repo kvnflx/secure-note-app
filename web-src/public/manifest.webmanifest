@@ -1,8 +1,12 @@
 {
-  "name": "burn.note",
-  "short_name": "burn",
+  "name": "Secure Note",
+  "short_name": "Secure Note",
+  "description": "Sende verschlüsselte Notizen, die sich nach dem Lesen selbst zerstören.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0a0a0a",
-  "theme_color": "#dc2626"
+  "background_color": "#0A0A0A",
+  "theme_color": "#2563EB",
+  "icons": [
+    { "src": "/logo.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
 }

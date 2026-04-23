@@ -11,7 +11,7 @@ export function initTheme() {
   });
 }
 
-function get() { return localStorage.getItem(KEY) || 'auto'; }
+function get() { return localStorage.getItem(KEY) || 'dark'; }
 function set(v) { localStorage.setItem(KEY, v); apply(v); }
 function next(v) { return v === 'auto' ? 'light' : v === 'light' ? 'dark' : 'auto'; }
 
