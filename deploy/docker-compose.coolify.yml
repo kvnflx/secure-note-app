@@ -1,0 +1,75 @@
+# Coolify-specific compose file for burn-note.
+#
+# Differences from deploy/docker-compose.yml:
+# - No Caddy: Coolify's built-in traefik handles TLS termination + routing.
+# - No port mapping on burn: Coolify wires traefik to the service via the
+#   configured domain (set in the Coolify UI, not here).
+# - Redis stays ephemeral (tmpfs), unix-socket only, no persistence.
+#
+# Deploy via Coolify → Resources → + New → Service → Docker Compose (empty)
+# → paste this file. Then open the burn service and set the domain to
+# `https://note.backsafe.de` (or whatever hostname you want).
+
+services:
+  burn:
+    image: ghcr.io/kvnflx/burn-note:latest
+    restart: unless-stopped
+    environment:
+      BURN_LISTEN_ADDR: ":8080"
+      BURN_REDIS_SOCKET: /sockets/redis.sock
+      BURN_REDIS_NETWORK: unix
+      BURN_POW_DIFFICULTY: "20"
+      BURN_MAX_CIPHERTEXT_KB: "100"
+    expose:
+      - "8080"
+    volumes:
+      - sockets:/sockets
+    read_only: true
+    user: "65532:65532"
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      - redis
+    # Coolify's UI appends the traefik labels automatically once you assign
+    # a domain. If you prefer to hardcode them, uncomment the block below
+    # and replace the hostname.
+    #
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.http.routers.burn.rule=Host(`note.backsafe.de`)"
+    #   - "traefik.http.routers.burn.entrypoints=https"
+    #   - "traefik.http.routers.burn.tls=true"
+    #   - "traefik.http.routers.burn.tls.certresolver=letsencrypt"
+    #   - "traefik.http.services.burn.loadbalancer.server.port=8080"
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --unixsocket
+      - /sockets/redis.sock
+      - --unixsocketperm
+      - "770"
+      - --port
+      - "0"
+      - --appendonly
+      - "no"
+      - --save
+      - ""
+      - --maxmemory
+      - "256mb"
+      - --maxmemory-policy
+      - volatile-ttl
+      - --protected-mode
+      - "no"
+    volumes:
+      - sockets:/sockets
+    tmpfs:
+      - /data
+    read_only: true
+
+volumes:
+  sockets:
