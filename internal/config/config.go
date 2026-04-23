@@ -9,19 +9,21 @@ import (
 )
 
 type Config struct {
-	ListenAddr       string
-	RedisSocket      string
-	MaxCiphertextKB  int
-	POWDifficulty    int
-	POWSeedTTLSec    int
-	ExpiryOptions    []int
-	MaxExpirySec     int
+	ListenAddr      string
+	RedisSocket     string
+	RedisNetwork    string
+	MaxCiphertextKB int
+	POWDifficulty   int
+	POWSeedTTLSec   int
+	ExpiryOptions   []int
+	MaxExpirySec    int
 }
 
 func Load() (*Config, error) {
 	cfg := &Config{
 		ListenAddr:      envOr("BURN_LISTEN_ADDR", ":8080"),
 		RedisSocket:     os.Getenv("BURN_REDIS_SOCKET"),
+		RedisNetwork:    envOr("BURN_REDIS_NETWORK", "unix"),
 		MaxCiphertextKB: envInt("BURN_MAX_CIPHERTEXT_KB", 100),
 		POWDifficulty:   envInt("BURN_POW_DIFFICULTY", 20),
 		POWSeedTTLSec:   envInt("BURN_POW_SEED_TTL_SEC", 300),
