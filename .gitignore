@@ -5,10 +5,10 @@
 *.out
 coverage.*
 
-# Node
+# Node / frontend build artifacts
 /web-src/node_modules/
-/web/assets-built/
 /web-src/dist/
+/web/
 
 # IDE
 .idea/

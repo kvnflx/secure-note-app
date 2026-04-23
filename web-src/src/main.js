@@ -1,7 +1,7 @@
 import { renderCompose } from './views/compose.js';
 import { renderReveal } from './views/reveal.js';
 import { initTheme } from './ui/theme.js';
-import { initI18n, t } from './ui/i18n.js';
+import { initI18n } from './ui/i18n.js';
 
 async function boot() {
   await initI18n();
