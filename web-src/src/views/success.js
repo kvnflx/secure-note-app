@@ -12,6 +12,10 @@ export function renderSuccess(root, data) {
         <button id="copy">${t('success.copy', 'Copy')}</button>
       </div>
       <p class="status">${t('success.expiry', 'Expires at')} ${expiry}</p>
+      <details class="qrDetails">
+        <summary>📱 Show QR</summary>
+        <div id="qr" class="qr"></div>
+      </details>
       <hr>
       <h2>${t('success.kill.title', 'Kill switch')}</h2>
       <p>${t('success.kill.hint', 'You can destroy this note manually at any time:')}</p>
@@ -35,6 +39,10 @@ export function renderSuccess(root, data) {
     } catch (e) {
       root.querySelector('#killStatus').textContent = '❌ ' + e.message;
     }
+  });
+
+  import('../ui/qr.js').then(m => {
+    m.renderQR(root.querySelector('#qr'), data.url);
   });
 }
 
