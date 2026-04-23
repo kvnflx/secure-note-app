@@ -68,7 +68,7 @@ jobs:
         env:
           BURN_REDIS_SOCKET: "localhost:6379"
           BURN_REDIS_NETWORK: "tcp"
-          BURN_POW_DIFFICULTY: "4"
+          BURN_POW_DIFFICULTY: "8"
           BURN_LISTEN_ADDR: ":8080"
         run: |
           go run ./cmd/burn &
