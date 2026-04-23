@@ -13,7 +13,7 @@ services:
     restart: unless-stopped
 
   burn:
-    image: ghcr.io/fynnsh/burn-note:latest
+    image: ghcr.io/kvnflx/burn-note:latest
     restart: unless-stopped
     environment:
       BURN_LISTEN_ADDR: ":8080"
