@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>One-Time Note</title>
+    <meta name="theme-color" content="#111">
+    <link rel="stylesheet" href="/app.css">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <script>
+      // Theme bootstrap to avoid FOUC.
+      (function () {
+        var t = localStorage.getItem('bn-theme') || 'auto';
+        var d = t === 'dark' || (t === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = d ? 'dark' : 'light';
+      })();
+    </script>
+    <script type="module" crossorigin src="/assets/app-DgUK8Ud8.js"></script>
+  </head>
+  <body>
+    <main id="app"></main>
+  </body>
+</html>
