@@ -23,5 +23,10 @@
   "reveal.decrypting": "Entschlüssele…",
   "reveal.gone": "Diese Nachricht existiert nicht mehr.",
   "reveal.expired": "Diese Nachricht existiert nicht mehr.",
-  "reveal.wrongPassword": "Falsches Passwort."
+  "reveal.wrongPassword": "Falsches Passwort.",
+  "errors.pow_failed":  "Proof-of-Work fehlgeschlagen. Bitte erneut versuchen.",
+  "errors.bad_request": "Anfrage ungültig.",
+  "errors.gone":        "Diese Nachricht ist nicht mehr verfügbar.",
+  "errors.forbidden":   "Nicht erlaubt.",
+  "errors.internal":    "Serverfehler. Bitte später erneut versuchen."
 }

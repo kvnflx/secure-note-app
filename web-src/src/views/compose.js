@@ -102,7 +102,8 @@ async function submit(ta, sel, btn, status, pwToggle, pwInput, codeMode) {
     const { renderSuccess } = await import('./success.js');
     renderSuccess(document.getElementById('app'), { url, kill: resp.kill_token, expiresAt: resp.expires_at, id: resp.id });
   } catch (e) {
-    status.textContent = '❌ ' + e.message;
+    const { formatError } = await import('../ui/errors.js');
+    status.textContent = '❌ ' + formatError(e);
     btn.disabled = false;
   }
 }

@@ -41,7 +41,8 @@ export function renderSuccess(root, data) {
       await killNote(data.id, data.kill);
       root.querySelector('#killStatus').textContent = '🔥 ' + t('success.killed', 'Destroyed.');
     } catch (e) {
-      root.querySelector('#killStatus').textContent = '❌ ' + e.message;
+      const { formatError } = await import('../ui/errors.js');
+      root.querySelector('#killStatus').textContent = '❌ ' + formatError(e);
     }
   });
 

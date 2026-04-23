@@ -23,5 +23,10 @@
   "reveal.decrypting": "Decrypting…",
   "reveal.gone": "This note is already gone.",
   "reveal.expired": "This note no longer exists.",
-  "reveal.wrongPassword": "Wrong password."
+  "reveal.wrongPassword": "Wrong password.",
+  "errors.pow_failed":  "Proof-of-work failed. Please retry.",
+  "errors.bad_request": "Request was invalid.",
+  "errors.gone":        "This note is gone.",
+  "errors.forbidden":   "Not allowed.",
+  "errors.internal":    "Server error. Please retry later."
 }

@@ -117,8 +117,10 @@ export function renderReveal(root, id) {
       if (e.status === 404) {
         status.textContent = '🔥 ' + t('reveal.gone', 'This note is already gone.');
       } else {
-        status.textContent = '❌ ' + e.message;
+        const { formatError } = await import('../ui/errors.js');
+        status.textContent = '❌ ' + formatError(e);
       }
+      btn.disabled = false;
     }
   });
 }
