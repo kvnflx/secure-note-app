@@ -20,5 +20,8 @@ export default defineConfig({
       '/api': 'http://localhost:8080',
       '/n': 'http://localhost:8080'
     }
+  },
+  test: {
+    exclude: ['e2e/**', 'node_modules/**', 'dist/**', '../web/**']
   }
 });
