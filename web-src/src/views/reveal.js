@@ -31,11 +31,31 @@ export function renderReveal(root, id) {
       const ct = fromB64(resp.ciphertext);
       const key = fromB64Url(frag.k);
       const pt = decrypt(key, ct);
+      // Inject countdown UI above content
+      const cd = document.createElement('div');
+      cd.className = 'countdown';
+      cd.innerHTML = `⏱ <span id="cd">1:00</span> <button id="extend" type="button">+60s</button>`;
+      content.parentNode.insertBefore(cd, content);
+
       content.textContent = new TextDecoder().decode(pt);
       content.hidden = false;
       const toolbar = root.querySelector('#revealToolbar');
       toolbar.hidden = false;
       import('../ui/mask.js').then(m => m.attachMask(content, root.querySelector('#maskReveal')));
+
+      let extended = false;
+      const { startCountdown } = await import('../ui/countdown.js');
+      const ctl = startCountdown(cd.querySelector('#cd'), 60, () => {
+        content.textContent = '🔥 ' + t('reveal.expired', 'This note no longer exists.');
+        cd.remove();
+      });
+      cd.querySelector('#extend').addEventListener('click', () => {
+        if (extended) return;
+        extended = true;
+        ctl.extend(60);
+        cd.querySelector('#extend').disabled = true;
+      });
+
       status.textContent = '';
       btn.hidden = true;
     } catch (e) {
