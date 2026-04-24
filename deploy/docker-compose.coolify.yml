@@ -10,6 +10,7 @@
 services:
   burn:
     image: ghcr.io/kvnflx/burn-note:latest
+    pull_policy: always
     restart: unless-stopped
     environment:
       - SERVICE_FQDN_BURN=https://note.backsafe.de
