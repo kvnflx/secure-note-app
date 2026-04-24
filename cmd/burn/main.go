@@ -16,9 +16,6 @@ import (
 	"github.com/kvnflx/burn-note/internal/storage"
 )
 
-//go:embed shell.html
-var shellHTML []byte
-
 //go:embed all:web-assets
 var webFS embed.FS
 
@@ -37,12 +34,16 @@ func main() {
 	}
 	defer store.Close()
 
-	h := api.New(cfg, store, shellHTML)
+	spaShell, err := api.SPAShellBytes(webFS)
+	if err != nil {
+		log.Fatalf("spa shell: %v", err)
+	}
+	h := api.New(cfg, store, spaShell)
 	static, err := api.StaticHandler(webFS)
 	if err != nil {
 		log.Fatalf("static: %v", err)
 	}
-	handler := api.Recover(api.SecurityHeaders(api.MaxJSONBytes(int64(cfg.MaxCiphertextKB)*1024*2, h.RoutesWithStatic(static))))
+	handler := api.Recover(api.SecurityHeaders(api.MaxJSONBytes(int64(cfg.MaxCiphertextKB)*1024*2, h.RoutesWithStatic(static, spaShell))))
 
 	srv := &http.Server{
 		Addr:              cfg.ListenAddr,

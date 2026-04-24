@@ -8,7 +8,6 @@ import (
 // spaRoutes lists additional client-rendered paths that must be served
 // with the HTML shell (so a reload or direct link works).
 var spaRoutes = map[string]struct{}{
-	"/":             {},
 	"/use-cases":    {},
 	"/how-it-works": {},
 	"/imprint":      {},
@@ -38,9 +37,10 @@ func (h *Handler) Routes() http.Handler {
 	return mux
 }
 
-// RoutesWithStatic is like Routes() but additionally serves static assets from
-// the provided handler for any path not matched by an API or shell route.
-func (h *Handler) RoutesWithStatic(static http.Handler) http.Handler {
+// RoutesWithStatic serves API, the reveal shell, SPA pages, and falls back
+// to the static file server (Vite-built index.html, assets) for the root
+// and everything else.
+func (h *Handler) RoutesWithStatic(static http.Handler, spaShell []byte) http.Handler {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /api/pow/challenge", h.POWChallenge)
@@ -60,7 +60,9 @@ func (h *Handler) RoutesWithStatic(static http.Handler) http.Handler {
 
 	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		if _, ok := spaRoutes[r.URL.Path]; ok {
-			h.RevealShell(w, r)
+			w.Header().Set("Content-Type", "text/html; charset=utf-8")
+			w.Header().Set("Cache-Control", "no-cache")
+			_, _ = w.Write(spaShell)
 			return
 		}
 		static.ServeHTTP(w, r)

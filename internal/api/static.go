@@ -13,3 +13,14 @@ func StaticHandler(root fs.FS) (http.Handler, error) {
 	}
 	return http.FileServer(http.FS(sub)), nil
 }
+
+// SPAShellBytes reads the Vite-built index.html out of the embedded
+// filesystem. It is the canonical shell for client-rendered routes, since
+// it carries the hashed asset URLs produced by the build.
+func SPAShellBytes(root fs.FS) ([]byte, error) {
+	sub, err := fs.Sub(root, "web-assets")
+	if err != nil {
+		return nil, err
+	}
+	return fs.ReadFile(sub, "index.html")
+}
