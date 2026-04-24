@@ -1,4 +1,4 @@
-module github.com/fynnsh/burn-note
+module github.com/kvnflx/burn-note
 
 go 1.22
 

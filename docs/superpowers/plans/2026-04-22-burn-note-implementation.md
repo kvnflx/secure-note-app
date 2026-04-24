@@ -102,7 +102,7 @@
 Run:
 ```bash
 cd C:/Projekte/notepad
-go mod init github.com/fynnsh/burn-note
+go mod init github.com/kvnflx/burn-note
 ```
 
 Expected: `go.mod` created.
@@ -954,10 +954,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fynnsh/burn-note/internal/config"
-	"github.com/fynnsh/burn-note/internal/crypto"
-	"github.com/fynnsh/burn-note/internal/pow"
-	"github.com/fynnsh/burn-note/internal/storage"
+	"github.com/kvnflx/burn-note/internal/config"
+	"github.com/kvnflx/burn-note/internal/crypto"
+	"github.com/kvnflx/burn-note/internal/pow"
+	"github.com/kvnflx/burn-note/internal/storage"
 )
 
 type Handler struct {
@@ -1192,9 +1192,9 @@ import (
 	"time"
 
 	"github.com/alicebob/miniredis/v2"
-	"github.com/fynnsh/burn-note/internal/config"
-	"github.com/fynnsh/burn-note/internal/pow"
-	"github.com/fynnsh/burn-note/internal/storage"
+	"github.com/kvnflx/burn-note/internal/config"
+	"github.com/kvnflx/burn-note/internal/pow"
+	"github.com/kvnflx/burn-note/internal/storage"
 )
 
 func testHandler(t *testing.T) *Handler {
@@ -1389,9 +1389,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/fynnsh/burn-note/internal/api"
-	"github.com/fynnsh/burn-note/internal/config"
-	"github.com/fynnsh/burn-note/internal/storage"
+	"github.com/kvnflx/burn-note/internal/api"
+	"github.com/kvnflx/burn-note/internal/config"
+	"github.com/kvnflx/burn-note/internal/storage"
 )
 
 //go:embed shell.html
@@ -3615,7 +3615,7 @@ services:
     depends_on: [burn]
 
   burn:
-    image: ghcr.io/fynnsh/burn-note:latest
+    image: ghcr.io/kvnflx/burn-note:latest
     restart: unless-stopped
     environment:
       BURN_LISTEN_ADDR: ":8080"
@@ -3952,7 +3952,7 @@ Write `docs/HOSTING.md`:
 
 2. Clone the repo:
 ```bash
-git clone https://github.com/fynnsh/burn-note.git
+git clone https://github.com/kvnflx/burn-note.git
 cd burn-note/deploy
 ```
 
@@ -4079,7 +4079,7 @@ GitHub Actions → Release workflow should build multi-arch, push to GHCR, sign 
 
 On your VPS:
 ```bash
-git clone https://github.com/fynnsh/burn-note.git
+git clone https://github.com/kvnflx/burn-note.git
 cd burn-note/deploy
 # Edit Caddyfile hostname
 docker compose up -d
@@ -4115,10 +4115,10 @@ Post to relevant communities (HN, r/privacy, cypherpunks mailing list) with a sh
 - Task 1.9 mentions a future `scripts/solve_pow.go` utility — the workaround (lower `BURN_POW_DIFFICULTY=4` during dev) is concrete.
 - Task 3.10 references placeholder PNG icons; noted explicitly as v1 acceptable.
 - Task 5.2 Dockerfile references a vite `outDir` discussion — the actual config file (Task 2.1) is concrete with `outDir: '../web'`; Dockerfile `COPY --from=web` may need a path adjustment, flagged explicitly.
-- Task 5.7 Step 2 references an env override pattern (`BURN_IMAGE`); compose file uses a hardcoded tag, so the step should be adjusted to either `sed` the image or use a compose override. **Fix:** Add a note that tag is fixed at `ghcr.io/fynnsh/burn-note:latest`; for the dry-run use `docker compose up -d` after building and retagging locally:
-  - Actually, clean approach: retag the dev image: `docker tag burn:v0.1.0 ghcr.io/fynnsh/burn-note:latest` before `docker compose up -d`. Let me fix this inline.
+- Task 5.7 Step 2 references an env override pattern (`BURN_IMAGE`); compose file uses a hardcoded tag, so the step should be adjusted to either `sed` the image or use a compose override. **Fix:** Add a note that tag is fixed at `ghcr.io/kvnflx/burn-note:latest`; for the dry-run use `docker compose up -d` after building and retagging locally:
+  - Actually, clean approach: retag the dev image: `docker tag burn:v0.1.0 ghcr.io/kvnflx/burn-note:latest` before `docker compose up -d`. Let me fix this inline.
 
-- Let me also fix: Task 1.7 handler_test imports paths use `github.com/fynnsh/burn-note` — module path must match `go.mod`. Task 1.1 Step 1 set the module path to `github.com/fynnsh/burn-note`, so this is consistent.
+- Let me also fix: Task 1.7 handler_test imports paths use `github.com/kvnflx/burn-note` — module path must match `go.mod`. Task 1.1 Step 1 set the module path to `github.com/kvnflx/burn-note`, so this is consistent.
 
 **Type consistency:**
 - `crypto.NewKillToken()` returns a 43-char string (Task 1.3) — matches 32-byte random base64 url-safe no-padding = `ceil(32*4/3) - 0 = 43 chars`. ✓

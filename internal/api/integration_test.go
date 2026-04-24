@@ -11,9 +11,9 @@ import (
 	"testing"
 
 	"github.com/alicebob/miniredis/v2"
-	"github.com/fynnsh/burn-note/internal/config"
-	"github.com/fynnsh/burn-note/internal/pow"
-	"github.com/fynnsh/burn-note/internal/storage"
+	"github.com/kvnflx/burn-note/internal/config"
+	"github.com/kvnflx/burn-note/internal/pow"
+	"github.com/kvnflx/burn-note/internal/storage"
 )
 
 // TestIntegrationHappyPath spins up the real HTTP stack (middleware + router + handlers)

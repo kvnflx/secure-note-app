@@ -11,9 +11,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/fynnsh/burn-note/internal/api"
-	"github.com/fynnsh/burn-note/internal/config"
-	"github.com/fynnsh/burn-note/internal/storage"
+	"github.com/kvnflx/burn-note/internal/api"
+	"github.com/kvnflx/burn-note/internal/config"
+	"github.com/kvnflx/burn-note/internal/storage"
 )
 
 //go:embed shell.html

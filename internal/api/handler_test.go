@@ -13,9 +13,9 @@ import (
 	"time"
 
 	"github.com/alicebob/miniredis/v2"
-	"github.com/fynnsh/burn-note/internal/config"
-	"github.com/fynnsh/burn-note/internal/pow"
-	"github.com/fynnsh/burn-note/internal/storage"
+	"github.com/kvnflx/burn-note/internal/config"
+	"github.com/kvnflx/burn-note/internal/pow"
+	"github.com/kvnflx/burn-note/internal/storage"
 )
 
 func testHandler(t *testing.T) *Handler {
