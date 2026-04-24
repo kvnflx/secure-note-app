@@ -1,9 +1,8 @@
 let strings = {};
 export async function initI18n() {
-  const lang = (navigator.language || 'en').slice(0, 2);
+  // Force English across the site — brand is English.
   try {
-    const url = `/i18n/${lang}.json`;
-    const res = await fetch(url);
+    const res = await fetch('/i18n/en.json');
     strings = await res.json();
   } catch {
     strings = {};

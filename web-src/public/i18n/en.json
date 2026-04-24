@@ -1,7 +1,7 @@
 {
-  "compose.title": "New note",
-  "compose.lede": "The note is encrypted in your browser, stored briefly, and destroyed the moment it is read.",
-  "compose.placeholder": "Type your message here. It never reaches the server in plain text.",
+  "compose.title": "Secure Note",
+  "compose.lede": "Write an encrypted note. It destroys itself the moment it is read.",
+  "compose.placeholder": "Type your message. It is encrypted on your device before it is sent.",
   "compose.options": "Options",
   "compose.expiry": "Expires after",
   "compose.submit": "Create note",
@@ -21,7 +21,7 @@
   "strength.too_common": "Too common",
 
   "success.title": "Note ready",
-  "success.lede": "Share this link. It will be destroyed the moment it is opened.",
+  "success.lede": "Share this link. The note destroys itself the moment it is opened.",
   "success.linkLabel": "Share link",
   "success.copy": "Copy",
   "success.copied": "Copied",
@@ -29,7 +29,7 @@
   "success.qr": "Show QR code",
   "success.expiry": "Expires",
   "success.kill.title": "Destroy now",
-  "success.kill.hint": "If you change your mind, you can destroy the note before it is read.",
+  "success.kill.hint": "Change your mind? Destroy the note before anyone opens it.",
   "success.kill.btn": "Destroy this note",
   "success.kill.confirm": "Destroy this note? This cannot be undone.",
   "success.killed": "Destroyed. The link is now inactive.",

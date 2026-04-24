@@ -8,8 +8,8 @@ import { icons } from '../ui/icons.js';
 export function renderCompose(root) {
   root.innerHTML = `
     <section class="compose">
-      <h1 tabindex="-1">${t('compose.title', 'New note')}</h1>
-      <p class="lede">${t('compose.lede', 'The note is encrypted in your browser, stored briefly, and destroyed the moment it is read.')}</p>
+      <h1 tabindex="-1">${t('compose.title', 'Secure Note')}</h1>
+      <p class="lede">${t('compose.lede', 'Write an encrypted note. It destroys itself the moment it is read.')}</p>
 
       <label for="msg" class="sr-only">Message</label>
       <textarea
