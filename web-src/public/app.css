@@ -1177,6 +1177,17 @@ main:has(.page) { max-width: 720px; }
   line-height: 1.65;
 }
 
+.muted-small {
+  font-size: var(--text-12);
+  color: var(--fg-subtle);
+  margin-top: var(--s-32);
+}
+
+.legal h3 {
+  margin: var(--s-20) 0 var(--s-8);
+  font-size: var(--text-14);
+}
+
 .license-text {
   font-family: var(--font-mono);
   font-size: var(--text-12);
