@@ -1,6 +1,6 @@
 # Threat Model
 
-This document describes what burn-note protects against, what it does not, and
+This document describes what secure-note-app protects against, what it does not, and
 the explicit trade-offs we accept.
 
 ## What we protect
@@ -66,7 +66,7 @@ the wrap-password is bounded only by Argon2id — not infinite, but finite.
 Pick real passwords.
 
 ### 4. Network-level anonymity
-burn-note v1 does not run as a Tor hidden service. A determined observer who
+secure-note-app v1 does not run as a Tor hidden service. A determined observer who
 can see both the sender's and recipient's network traffic can correlate
 create/reveal timestamps and connection metadata. If this matters to you, run
 your own instance behind Tor; see [HOSTING.md](HOSTING.md).

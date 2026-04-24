@@ -1,8 +1,8 @@
-# Burn-Note Implementation Plan
+# Secure Note Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build a self-destructing one-time message webapp (burn-note) that is E2E-encrypted, zero-metadata, open-source, self-hostable via Docker Compose, production-ready under the planned domain `note.backsafe.de`.
+**Goal:** Build a self-destructing one-time message webapp (secure-note-app) that is E2E-encrypted, zero-metadata, open-source, self-hostable via Docker Compose, production-ready under the planned domain `note.backsafe.de`.
 
 **Architecture:** Thin Go HTTP server behind Caddy TLS reverse-proxy, backed by in-memory Redis (tmpfs, no persistence) connected via Unix socket. Crypto happens entirely in the browser (libsodium.js XChaCha20-Poly1305, optional Argon2id wrap). The decrypt key lives in the URL fragment and never reaches the server. A static Click-to-Reveal HTML shell protects against link-preview crawlers. Abuse is limited via SHA-256 Proof-of-Work challenges (no IP tracking). Deployed as a 3-container Docker Compose stack (`caddy` + `burn` + `redis`) on a 4 €/month VPS.
 
@@ -141,7 +141,7 @@ Download the canonical AGPL-3.0 text from `https://www.gnu.org/licenses/agpl-3.0
 
 Write `C:/Projekte/notepad/README.md`:
 ```markdown
-# burn-note
+# secure-note-app
 
 Self-destructing one-time messages. E2E-encrypted, zero-metadata, open-source.
 
@@ -225,7 +225,7 @@ Expected: compile failure (`Load`/`Config` undefined).
 
 Write `internal/config/config.go`:
 ```go
-// Package config loads burn-note runtime configuration from environment variables.
+// Package config loads secure-note-app runtime configuration from environment variables.
 package config
 
 import (
@@ -943,7 +943,7 @@ git commit -m "feat(api): add body-limit, security-header, and recover middlewar
 
 Write `internal/api/handler.go`:
 ```go
-// Package api implements the burn-note HTTP interface.
+// Package api implements the secure-note-app HTTP interface.
 package api
 
 import (
@@ -2019,7 +2019,7 @@ export function renderCompose(root) {
   root.innerHTML = `
     <section class="compose">
       <header>
-        <h1>🔥 burn.note</h1>
+        <h1>🔥 Secure Note</h1>
         <p class="tag">${t('compose.tag', 'one-time notes, zero metadata')}</p>
       </header>
       <textarea id="msg" rows="10" placeholder="${t('compose.placeholder', 'Write your message…')}" autocomplete="off" spellcheck="false"></textarea>
@@ -2971,7 +2971,7 @@ git commit -m "feat(web): code mode with lazy highlight.js rendering in reveal"
 Write `web-src/manifest.webmanifest`:
 ```json
 {
-  "name": "burn.note",
+  "name": "Secure Note",
   "short_name": "burn",
   "start_url": "/",
   "display": "standalone",
@@ -3848,7 +3848,7 @@ git commit -m "ci(release): multi-arch image build + cosign signing on tag"
 
 Write `C:/Projekte/notepad/docs/README.md`:
 ```markdown
-# burn-note
+# secure-note-app
 
 Self-destructing one-time messages. E2E-encrypted, zero-metadata, open-source.
 
@@ -3905,7 +3905,7 @@ Write `docs/THREAT-MODEL.md`:
 ```markdown
 # Threat Model
 
-This file documents what burn-note protects against, what it does not, and the explicit trade-offs.
+This file documents what secure-note-app protects against, what it does not, and the explicit trade-offs.
 
 ## Protected
 
@@ -3923,7 +3923,7 @@ This file documents what burn-note protects against, what it does not, and the e
 1. **Live server backdoor**: a runtime compromise of the Go process could capture plaintext requests (which are still ciphertext, not cleartext) and client IPs. Content remains encrypted.
 2. **Client-side malware**: compromised browsers, keyloggers, screen recorders, or clipboard hijackers on the sender/recipient device are out of scope.
 3. **Weak passwords**: once a recipient has the ciphertext (post-reveal), brute-forcing the wrap-password is bounded only by Argon2id — not infinite, but finite. Pick real passwords.
-4. **Network-level anonymity**: burn-note v1 does not run as a Tor Hidden Service. A determined observer who can see both the sender's and recipient's network can correlate the create/reveal via connection timing. Run your own instance behind Tor if this matters to you (`HOSTING.md` describes how).
+4. **Network-level anonymity**: secure-note-app v1 does not run as a Tor Hidden Service. A determined observer who can see both the sender's and recipient's network can correlate the create/reveal via connection timing. Run your own instance behind Tor if this matters to you (`HOSTING.md` describes how).
 5. **Metadata available to operators of your path (ISP, VPN, CF Tunnel, etc.)**: that is outside our scope — we only control what happens on our server.
 
 ## Explicit trade-offs
@@ -3953,7 +3953,7 @@ Write `docs/HOSTING.md`:
 2. Clone the repo:
 ```bash
 git clone https://github.com/kvnflx/secure-note-app.git
-cd burn-note/deploy
+cd secure-note-app/deploy
 ```
 
 3. Edit `Caddyfile`: replace `note.backsafe.de` with your hostname.
@@ -4080,7 +4080,7 @@ GitHub Actions → Release workflow should build multi-arch, push to GHCR, sign 
 On your VPS:
 ```bash
 git clone https://github.com/kvnflx/secure-note-app.git
-cd burn-note/deploy
+cd secure-note-app/deploy
 # Edit Caddyfile hostname
 docker compose up -d
 ```
@@ -4132,4 +4132,4 @@ All critical gaps addressed.
 
 ---
 
-**Plan complete and saved to `docs/superpowers/plans/2026-04-22-burn-note-implementation.md`.**
+**Plan complete and saved to `docs/superpowers/plans/2026-04-22-secure-note-app-implementation.md`.**

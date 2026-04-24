@@ -1,6 +1,6 @@
-# Burn Note — Design System (v2: Dev-Console)
+# Secure Note — Design System (v2: Dev-Console)
 
-**Scope:** Burn-Note project only. Not a global design system.
+**Scope:** Secure Note project only. Not a global design system.
 
 **Aesthetic reference:** Linear · Vercel · Raycast · Dub.co · Plausible.
 Minimal, monochrome, dev-tool feel. The UI is functional infrastructure,
@@ -133,7 +133,7 @@ and success colors only appear when semantically needed.
 ### 7.1 Header (minimal)
 
 ```
-[● Burn Note]                                          [☾] [EN ▾]
+[● Secure Note]                                          [☾] [EN ▾]
 ```
 - Brand: wordmark + pulsing 6px accent dot (status indicator).
 - Right: theme toggle (ghost icon button), optional language switch.

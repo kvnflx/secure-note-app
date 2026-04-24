@@ -1,4 +1,4 @@
-# Deploy burn-note on Coolify (Hetzner)
+# Deploy secure-note-app on Coolify (Hetzner)
 
 Coolify is a self-hosted PaaS. It provides the traefik reverse-proxy, TLS
 termination via Let's Encrypt, and a clean UI for deploying Docker Compose
@@ -12,11 +12,11 @@ Caddy/Synology/Cloudflared involved.
 - Hetzner server (any tier — a CX22 at €4/month is plenty) with Coolify
   v4.x already installed and reachable
 - DNS for `backsafe.de` where you can add an `A` record
-- The burn-note image is built and available at
+- The secure-note-app image is built and available at
   `ghcr.io/kvnflx/secure-note-app:latest` (public — visibility set in
   [Step 1 of SYNOLOGY.md](SYNOLOGY.md#step-1--make-the-ghcr-image-pullable),
   or make it public once from
-  https://github.com/kvnflx?tab=packages → burn-note → Package settings →
+  https://github.com/kvnflx?tab=packages → secure-note-app → Package settings →
   Change visibility → Public)
 
 If the image is still private, Coolify can pull it with a registry
@@ -80,11 +80,11 @@ propagation takes 1–5 minutes for Cloudflare zones.
 
 Browser → your Coolify URL (e.g. `https://coolify.yourdomain.de`) → log in.
 
-## Step 3 — Create the burn-note service
+## Step 3 — Create the secure-note-app service
 
 1. Left nav → **Projects** → pick a project (or create one called `burn`).
 2. Inside the project: **+ Add New Resource** → **Docker Compose Empty**.
-3. **Name:** `burn-note`
+3. **Name:** `secure-note-app`
 4. **Server:** your Hetzner server (should already be registered in Coolify)
 5. **Destination / Network:** pick the default Coolify proxy network.
 6. Paste the contents of
@@ -127,9 +127,9 @@ The deployment log shows every step. Expect to see:
 
 ```
 [+] Pulling ...
-[+] Creating burn-note-burn-1
-[+] Creating burn-note-redis-1
-✅ Successfully deployed burn-note
+[+] Creating secure-note-app-burn-1
+[+] Creating secure-note-app-redis-1
+✅ Successfully deployed secure-note-app
 ```
 
 ## Step 7 — Verify

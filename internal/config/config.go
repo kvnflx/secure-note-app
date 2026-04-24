@@ -1,4 +1,4 @@
-// Package config loads burn-note runtime configuration from environment variables.
+// Package config loads Secure Note runtime configuration from environment variables.
 package config
 
 import (

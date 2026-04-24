@@ -1,4 +1,4 @@
-# burn-note
+# secure-note-app
 
 Self-destructing one-time messages. E2E-encrypted, zero-metadata, open-source.
 

@@ -1,6 +1,6 @@
 # Hosting guide
 
-This guide walks through running your own burn-note instance on a small VPS.
+This guide walks through running your own secure-note-app instance on a small VPS.
 
 ## Requirements
 
@@ -21,7 +21,7 @@ your VPS IP.
 
 ```bash
 git clone https://github.com/kvnflx/secure-note-app.git
-cd burn-note/deploy
+cd secure-note-app/deploy
 ```
 
 ### 3. Edit the Caddyfile
@@ -66,7 +66,7 @@ Should return `200 OK`.
 ## Updating
 
 ```bash
-cd burn-note/deploy
+cd secure-note-app/deploy
 docker compose pull
 docker compose up -d
 ```

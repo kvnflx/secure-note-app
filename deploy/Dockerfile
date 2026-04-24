@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.7
-# Multi-stage build for burn-note.
+# Multi-stage build for Secure Note.
 # Stage 1: build the Vite frontend.
 # Stage 2: build the Go binary with the frontend embedded.
 # Stage 3: minimal runtime image (distroless, non-root, read-only).

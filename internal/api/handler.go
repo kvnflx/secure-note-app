@@ -1,4 +1,4 @@
-// Package api implements the burn-note HTTP interface.
+// Package api implements the Secure Note HTTP interface.
 package api
 
 import (

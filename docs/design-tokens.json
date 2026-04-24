@@ -1,6 +1,6 @@
 {
   "$schema": "https://design-tokens.org/schema",
-  "name": "burn-note",
+  "name": "secure-note-app",
   "version": "1.0.0",
   "color": {
     "light": {

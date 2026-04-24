@@ -43,8 +43,8 @@ machine:
 On a VPS (or any machine with Docker):
 
 ```bash
-git clone https://github.com/<owner>/burn-note.git
-cd burn-note
+git clone https://github.com/<owner>/secure-note-app.git
+cd secure-note-app
 
 # Option A: build the image locally and run
 docker build -f deploy/Dockerfile -t burn:local .

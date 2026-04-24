@@ -1,4 +1,4 @@
-# Deploy burn-note on Synology DSM — **UI only, no SSH**
+# Deploy secure-note-app on Synology DSM — **UI only, no SSH**
 
 Everything below is done through **Synology DSM**, **Portainer (web UI)**, and
 the **Cloudflare dashboard**. No shell, no terminal, no package manager calls.
@@ -23,7 +23,7 @@ touching `it-space.cloud`.
                        │
                        ▼ same tunnel, new public hostname
  Synology NAS
-   cloudflared ──────► burn-note:8080 ─(unix socket)─► burn-redis (tmpfs)
+   cloudflared ──────► secure-note-app:8080 ─(unix socket)─► burn-redis (tmpfs)
         │               ↑
         └── joins ──────┘  Docker network "cloudflared_net"
 ```
@@ -57,7 +57,7 @@ privacy (private). Two options.
 ### Option A — Make the image public (recommended, doesn't affect source code)
 
 1. Browser: https://github.com/kvnflx?tab=packages
-2. Click the **burn-note** package.
+2. Click the **secure-note-app** package.
 3. Right column → **Package settings** → scroll down → **Danger Zone** →
    **Change visibility** → **Public** → type the package name → **I
    understand, change visibility**.
@@ -91,7 +91,7 @@ Typical build time: 5–8 minutes (multi-arch: amd64 + arm64 + cosign).
 
 ## Step 3 — Create the shared Docker network (in Portainer)
 
-Needed so that Cloudflared and the new burn-note container can find each
+Needed so that Cloudflared and the new secure-note-app container can find each
 other by name.
 
 1. Portainer → left nav → **Networks** → **+ Add network**.
@@ -105,10 +105,10 @@ You should now see `cloudflared_net` in the networks list.
 
 ---
 
-## Step 4 — Deploy the burn-note stack
+## Step 4 — Deploy the secure-note-app stack
 
 1. Portainer → **Stacks** → **+ Add stack**.
-2. **Name:** `burn-note`.
+2. **Name:** `secure-note-app`.
 3. **Build method:** **Web editor** (the default).
 4. Paste the entire contents of the file
    [`deploy/docker-compose.synology.yml`](../deploy/docker-compose.synology.yml)
@@ -125,10 +125,10 @@ registry created in Step 1B. Select it, confirm, and the pull proceeds.
 
 Portainer now pulls the image (first time: ~30 MB) and brings up two
 containers:
-- `burn-note` — the Go binary, listening on 8080 inside the shared network
+- `secure-note-app` — the Go binary, listening on 8080 inside the shared network
 - `burn-redis` — ephemeral Redis on tmpfs, unix-socket only
 
-In the Stacks list, the `burn-note` stack should show 2/2 running and green.
+In the Stacks list, the `secure-note-app` stack should show 2/2 running and green.
 
 ### Verify without SSH
 
@@ -139,12 +139,12 @@ In the Stacks list, the `burn-note` stack should show 2/2 running and green.
 3. Portainer → **Containers** → click **burn-redis** → **Console** →
    keep defaults (`/bin/sh`) → **Connect**. Run:
    ```sh
-   wget -qO- http://burn-note:8080/healthz
+   wget -qO- http://secure-note-app:8080/healthz
    ```
    Expected output: `ok`. This proves the two containers can see each other
    over `cloudflared_net`.
 
-   (`burn-note` itself is a distroless image, no shell, so we test from the
+   (`secure-note-app` itself is a distroless image, no shell, so we test from the
    Redis container instead.)
 
 ---
@@ -160,7 +160,7 @@ No container restart needed. Portainer handles it live.
 4. Dropdown → pick **`cloudflared_net`** → click **Join network**.
 5. The container now shows **2 networks** (its original one + `cloudflared_net`).
 
-### Verify cloudflared can reach burn-note
+### Verify cloudflared can reach secure-note-app
 
 1. Portainer → **Containers** → cloudflared → **Console** → `/bin/sh` (or
    whatever shell is in the image) → **Connect**. If cloudflared image has
@@ -169,7 +169,7 @@ No container restart needed. Portainer handles it live.
    connectivity issue if any.
 2. If the shell works, run:
    ```sh
-   wget -qO- http://burn-note:8080/healthz   # or: curl -s http://burn-note:8080/healthz
+   wget -qO- http://secure-note-app:8080/healthz   # or: curl -s http://secure-note-app:8080/healthz
    ```
    Expected: `ok`.
 
@@ -192,7 +192,7 @@ This is the "only one tunnel" part: you add a second public hostname to the
    | Domain | `backsafe.de` *(must appear in the dropdown)* |
    | Path | *(leave empty)* |
    | Service Type | `HTTP` |
-   | URL | `burn-note:8080` |
+   | URL | `secure-note-app:8080` |
 
 6. Expand **Additional application settings** → leave all defaults (no
    Access policy, no overrides).
@@ -212,7 +212,7 @@ Because there's no Caddy doing CSP/HSTS, we add them at Cloudflare's edge.
    the zone).
 2. Left nav → **Rules** → **Transform Rules** → **Modify Response Header**
    tab → **+ Create rule**.
-3. **Rule name:** `burn-note security headers`.
+3. **Rule name:** `secure-note-app security headers`.
 4. Under **When incoming requests match**:
    - Dropdown → **Custom filter expression** → **Edit expression**.
    - Paste: `(http.host eq "note.backsafe.de")`
@@ -246,7 +246,7 @@ Because there's no Caddy doing CSP/HSTS, we add them at Cloudflare's edge.
 ### From a browser
 
 1. Open https://note.backsafe.de in an incognito/private window.
-2. You should see the compose view ("🔥 burn.note", textarea, "Create note").
+2. You should see the compose view ("🔥 Secure Note", textarea, "Create note").
 3. Type a message → **Create note** → wait (~1 sec for PoW) → you get a
    success screen with the URL.
 4. Copy the URL → open in a **different** incognito window → click
@@ -280,7 +280,7 @@ versions after a future release:
 
 ### Manual, via Portainer (recommended for first few updates)
 
-1. Portainer → **Stacks** → **burn-note**.
+1. Portainer → **Stacks** → **secure-note-app**.
 2. Click **Editor** → do NOT change anything → click **Update the stack**.
 3. Check **Re-pull image and redeploy** → **Update**.
 
@@ -301,7 +301,7 @@ versions after a future release:
          WATCHTOWER_CLEANUP: "true"
    ```
 3. Add `labels: { com.centurylinklabs.watchtower.enable: "true" }` to the
-   `burn` service in the burn-note stack (open its editor, paste, redeploy).
+   `burn` service in the secure-note-app stack (open its editor, paste, redeploy).
 
 ---
 
@@ -314,7 +314,7 @@ Set up **UptimeRobot** (or similar) to monitor
 
 ## Troubleshooting
 
-### Portainer → Stacks → burn-note shows "1/2 running"
+### Portainer → Stacks → secure-note-app shows "1/2 running"
 
 Click the failed container → **Logs**. Common causes:
 - Wrong image name / image private without credential → pull error in logs
@@ -324,13 +324,13 @@ Click the failed container → **Logs**. Common causes:
 
 ### Cloudflare shows "502 Bad Gateway" at https://note.backsafe.de
 
-The tunnel is up but can't reach `burn-note:8080`. Check:
+The tunnel is up but can't reach `secure-note-app:8080`. Check:
 
-1. Portainer → Containers → `burn-note` → **is it running and healthy?**
+1. Portainer → Containers → `secure-note-app` → **is it running and healthy?**
 2. Portainer → Containers → cloudflared → **Connected networks** — does it
    include `cloudflared_net`? If not, re-do Step 5.
 3. Portainer → Containers → `burn-redis` → **Console** → `/bin/sh` →
-   `wget -qO- http://burn-note:8080/healthz` should print `ok`.
+   `wget -qO- http://secure-note-app:8080/healthz` should print `ok`.
 
 ### Cloudflare shows "Error 1033 - Argo Tunnel error"
 

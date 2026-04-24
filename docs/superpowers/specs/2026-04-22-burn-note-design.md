@@ -1,8 +1,8 @@
-# Burn-Note — Design-Spezifikation
+# Secure Note — Design-Spezifikation
 
 **Status:** Draft v1.0
 **Datum:** 2026-04-22
-**Projekt-Codename:** burn-note
+**Projekt-Codename:** secure-note-app
 **Geplante Domain:** note.backsafe.de
 **Lizenz:** AGPL-3.0
 **Autor:** fynn + Claude (brainstorming-Session)

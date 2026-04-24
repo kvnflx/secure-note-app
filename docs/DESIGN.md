@@ -1,6 +1,6 @@
 # Design System
 
-Professional, privacy-oriented visual identity for burn-note, aligned with the
+Professional, privacy-oriented visual identity for secure-note-app, aligned with the
 Backsafe brand. No decorative emojis, clear typographic hierarchy, restrained
 palette built on Backsafe Blue.
 
@@ -166,7 +166,7 @@ Reduced motion honoured via `@media (prefers-reduced-motion: reduce)`.
 
 ## Brand
 
-- Product name: **Burn Note** (title case), wordmark only (no logomark in
+- Product name: **Secure Note** (title case), wordmark only (no logomark in
   v1). Set in weight 600, `--text-xl`–`--text-2xl`, `--fg` colour.
 - Tagline: _End-to-end encrypted. Self-destructing. Zero metadata._
 - Tone: factual, terse, technical-credible. Avoid marketing language

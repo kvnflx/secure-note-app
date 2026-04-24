@@ -31,7 +31,7 @@ Out of scope:
 - Attacks relying on a compromised endpoint (browser, OS, clipboard hijacker,
   keylogger). Our threat model explicitly excludes this — see
   [THREAT-MODEL.md](THREAT-MODEL.md).
-- Missing best-practice headers on pages *other than* the burn-note app
+- Missing best-practice headers on pages *other than* the secure-note-app app
 - Self-XSS that requires the user to paste crafted code into the devtools
   console
 - Social engineering

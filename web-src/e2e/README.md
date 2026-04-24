@@ -1,6 +1,6 @@
 # E2E tests
 
-Playwright specs for burn-note. These assume a running Go backend on `:8080` (vite config proxies `/api` and `/n` to it).
+Playwright specs for secure-note-app. These assume a running Go backend on `:8080` (vite config proxies `/api` and `/n` to it).
 
 ## Run locally
 

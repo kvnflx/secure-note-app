@@ -1,9 +1,9 @@
-# Synology-specific compose file for burn-note.
+# Synology-specific compose file for secure-note-app.
 #
 # Differences from the reference deploy/docker-compose.yml:
 # - No Caddy: cloudflared handles TLS at the edge, the NAS serves HTTP only.
 # - The `burn` container publishes :8080 on the Docker bridge network under a
-#   stable name ("burn-note") so cloudflared can reach it by hostname.
+#   stable name ("secure-note-app") so cloudflared can reach it by hostname.
 # - Redis stays on a shared Docker socket volume, tmpfs data dir, no persistence.
 # - Restart policy: always (survives NAS reboots).
 # - Resource limits sized for a low-end DS box.
@@ -12,7 +12,7 @@
 
 services:
   burn:
-    container_name: burn-note
+    container_name: secure-note-app
     image: ghcr.io/kvnflx/secure-note-app:latest
     restart: always
     environment:
@@ -77,7 +77,7 @@ networks:
   burn_net:
     driver: bridge
   # This network MUST already exist — cloudflared attaches to it so it can
-  # reach `burn-note:8080`. Create it once with:
+  # reach `secure-note-app:8080`. Create it once with:
   #   docker network create cloudflared_net
   # OR attach cloudflared to `burn_net` instead (see docs/SYNOLOGY.md).
   cloudflared_net:
