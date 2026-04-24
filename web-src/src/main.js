@@ -68,6 +68,11 @@ function initSPALinks() {
 
 boot();
 
-if ('serviceWorker' in navigator && location.protocol === 'https:') {
-  navigator.serviceWorker.register('/sw.js').catch(() => {});
+// Do not register a service worker. The previous /sw.js cached "/" and
+// pinned visitors to stale HTML. The kill-switch /sw.js on the server
+// already unregisters the previously-installed worker on next visit.
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations()
+    .then(regs => regs.forEach(r => r.unregister().catch(() => {})))
+    .catch(() => {});
 }
