@@ -1,4 +1,4 @@
-module github.com/kvnflx/burn-note
+module github.com/kvnflx/secure-note-app
 
 go 1.22
 

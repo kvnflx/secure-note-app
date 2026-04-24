@@ -9,10 +9,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/kvnflx/burn-note/internal/config"
-	"github.com/kvnflx/burn-note/internal/crypto"
-	"github.com/kvnflx/burn-note/internal/pow"
-	"github.com/kvnflx/burn-note/internal/storage"
+	"github.com/kvnflx/secure-note-app/internal/config"
+	"github.com/kvnflx/secure-note-app/internal/crypto"
+	"github.com/kvnflx/secure-note-app/internal/pow"
+	"github.com/kvnflx/secure-note-app/internal/storage"
 )
 
 type Handler struct {

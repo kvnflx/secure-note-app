@@ -13,7 +13,7 @@ Caddy/Synology/Cloudflared involved.
   v4.x already installed and reachable
 - DNS for `backsafe.de` where you can add an `A` record
 - The burn-note image is built and available at
-  `ghcr.io/kvnflx/burn-note:latest` (public — visibility set in
+  `ghcr.io/kvnflx/secure-note-app:latest` (public — visibility set in
   [Step 1 of SYNOLOGY.md](SYNOLOGY.md#step-1--make-the-ghcr-image-pullable),
   or make it public once from
   https://github.com/kvnflx?tab=packages → burn-note → Package settings →
@@ -117,7 +117,7 @@ No secrets to set. All security-sensitive material is generated client-side.
 ## Step 6 — Deploy
 
 Click **Deploy**. Coolify:
-1. Pulls `ghcr.io/kvnflx/burn-note:latest` and `redis:7-alpine`
+1. Pulls `ghcr.io/kvnflx/secure-note-app:latest` and `redis:7-alpine`
 2. Brings up both containers on the internal proxy network
 3. Tells traefik about the `note.backsafe.de` route
 4. Traefik requests a Let's Encrypt certificate via HTTP-01 challenge

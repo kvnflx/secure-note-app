@@ -12,6 +12,7 @@ var spaRoutes = map[string]struct{}{
 	"/how-it-works": {},
 	"/imprint":      {},
 	"/privacy":      {},
+	"/license":      {},
 	"/success":      {},
 }
 

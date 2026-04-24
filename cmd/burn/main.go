@@ -11,9 +11,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/kvnflx/burn-note/internal/api"
-	"github.com/kvnflx/burn-note/internal/config"
-	"github.com/kvnflx/burn-note/internal/storage"
+	"github.com/kvnflx/secure-note-app/internal/api"
+	"github.com/kvnflx/secure-note-app/internal/config"
+	"github.com/kvnflx/secure-note-app/internal/storage"
 )
 
 //go:embed all:web-assets

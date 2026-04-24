@@ -1176,3 +1176,18 @@ main:has(.page) { max-width: 720px; }
   max-width: 60ch;
   line-height: 1.65;
 }
+
+.license-text {
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+  line-height: 1.65;
+  white-space: pre-wrap;
+  word-break: normal;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: var(--s-16) var(--s-20);
+  color: var(--fg-muted);
+  margin: 0 0 var(--s-16);
+  overflow-x: auto;
+}

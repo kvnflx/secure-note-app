@@ -4,6 +4,7 @@ import { renderUseCases } from './views/usecases.js';
 import { renderHowItWorks } from './views/howitworks.js';
 import { renderImprint } from './views/imprint.js';
 import { renderPrivacy } from './views/privacy.js';
+import { renderLicense } from './views/license.js';
 import { initTheme } from './ui/theme.js';
 import { initShortcuts } from './ui/shortcuts.js';
 import { initI18n } from './ui/i18n.js';
@@ -34,6 +35,8 @@ function route() {
     renderImprint(mount);
   } else if (p === '/privacy') {
     renderPrivacy(mount);
+  } else if (p === '/license') {
+    renderLicense(mount);
   } else {
     renderCompose(mount);
   }

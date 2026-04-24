@@ -20,7 +20,7 @@ your VPS IP.
 ### 2. Clone the repo on the VPS
 
 ```bash
-git clone https://github.com/kvnflx/burn-note.git
+git clone https://github.com/kvnflx/secure-note-app.git
 cd burn-note/deploy
 ```
 

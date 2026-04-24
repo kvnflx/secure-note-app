@@ -51,7 +51,7 @@ I assume `backsafe.de` is on Cloudflare below.
 ## Step 1 — Make the GHCR image pullable
 
 The image is published to GitHub Container Registry at
-`ghcr.io/kvnflx/burn-note`. By default the package inherits the repo's
+`ghcr.io/kvnflx/secure-note-app`. By default the package inherits the repo's
 privacy (private). Two options.
 
 ### Option A — Make the image public (recommended, doesn't affect source code)
@@ -81,7 +81,7 @@ privacy (private). Two options.
 ## Step 2 — Wait for the image to finish building
 
 First-time build is triggered by the `v0.1.0-rc1` git tag push. Check at
-https://github.com/kvnflx/burn-note/actions. When the **Release** workflow
+https://github.com/kvnflx/secure-note-app/actions. When the **Release** workflow
 shows a green checkmark, the image tags `0.1.0-rc1` and `latest` are
 available.
 
@@ -113,7 +113,7 @@ You should now see `cloudflared_net` in the networks list.
 4. Paste the entire contents of the file
    [`deploy/docker-compose.synology.yml`](../deploy/docker-compose.synology.yml)
    from the repo into the editor. (You can also open it at
-   https://github.com/kvnflx/burn-note/blob/main/deploy/docker-compose.synology.yml →
+   https://github.com/kvnflx/secure-note-app/blob/main/deploy/docker-compose.synology.yml →
    click **Raw** → copy-all.)
 5. **Environment variables:** leave empty (all needed vars are already in the
    compose file).
@@ -275,7 +275,7 @@ unchanged.
 
 ## Step 9 — Auto-update (optional)
 
-The compose file uses `image: ghcr.io/kvnflx/burn-note:latest`. To pull new
+The compose file uses `image: ghcr.io/kvnflx/secure-note-app:latest`. To pull new
 versions after a future release:
 
 ### Manual, via Portainer (recommended for first few updates)

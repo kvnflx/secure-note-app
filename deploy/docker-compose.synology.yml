@@ -13,7 +13,7 @@
 services:
   burn:
     container_name: burn-note
-    image: ghcr.io/kvnflx/burn-note:latest
+    image: ghcr.io/kvnflx/secure-note-app:latest
     restart: always
     environment:
       BURN_LISTEN_ADDR: ":8080"

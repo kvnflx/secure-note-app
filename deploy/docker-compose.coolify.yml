@@ -9,7 +9,7 @@
 
 services:
   burn:
-    image: ghcr.io/kvnflx/burn-note:latest
+    image: ghcr.io/kvnflx/secure-note-app:latest
     pull_policy: always
     restart: unless-stopped
     environment:

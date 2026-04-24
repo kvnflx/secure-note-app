@@ -48,7 +48,7 @@ cd burn-note
 
 # Option A: build the image locally and run
 docker build -f deploy/Dockerfile -t burn:local .
-docker tag burn:local ghcr.io/kvnflx/burn-note:latest
+docker tag burn:local ghcr.io/kvnflx/secure-note-app:latest
 cd deploy && docker compose up -d
 
 # Option B: pull the published image (after the first v* tag is pushed)
