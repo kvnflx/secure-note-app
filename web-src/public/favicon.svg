@@ -1,7 +1,20 @@
-<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-  <rect width="32" height="32" rx="8" fill="#2563EB"/>
-  <rect x="10" y="14" width="12" height="10" rx="1.5" fill="#FFFFFF"/>
-  <path d="M13 14v-2.5a3 3 0 0 1 6 0V14" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"/>
-  <circle cx="16" cy="18.5" r="1.2" fill="#2563EB"/>
-  <rect x="15.4" y="18.5" width="1.2" height="2.4" fill="#2563EB"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="7" fill="#0A0E17"/>
+  <!-- Shield outline with rounded corners -->
+  <path
+    d="M16 4.2 L25.3 7.6 C25.7 7.75 26 8.15 26 8.6 V15.5 C26 21.3 22.1 26.4 16.4 28.2 C16.14 28.28 15.86 28.28 15.6 28.2 C9.9 26.4 6 21.3 6 15.5 V8.6 C6 8.15 6.3 7.75 6.7 7.6 Z"
+    fill="none"
+    stroke="#007AFF"
+    stroke-width="1.8"
+    stroke-linejoin="round"
+  />
+  <!-- "S" curve inside shield, rounded line-art -->
+  <path
+    d="M19.5 12.2 C18.7 11.3 17.4 10.8 16 10.8 C14.3 10.8 12.8 11.8 12.8 13.3 C12.8 14.6 14 15.3 15.6 15.7 L16.6 16 C18.2 16.4 19.5 17.1 19.5 18.5 C19.5 20.1 18 21 16.2 21 C14.6 21 13.2 20.4 12.3 19.5"
+    fill="none"
+    stroke="#007AFF"
+    stroke-width="1.8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
 </svg>

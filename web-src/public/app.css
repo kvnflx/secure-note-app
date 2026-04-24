@@ -149,10 +149,10 @@ header.global .brand {
 }
 
 header.global .brand-logo {
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
   display: block;
-  border-radius: 5px;
+  border-radius: 6px;
 }
 
 @keyframes pulse {
