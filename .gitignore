@@ -30,3 +30,4 @@ docs/SESSION-*.md
 *.secrets
 .env
 .env.*
+.playwright-mcp/
