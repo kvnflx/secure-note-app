@@ -8,10 +8,12 @@ import { renderLicense } from './views/license.js';
 import { initTheme } from './ui/theme.js';
 import { initShortcuts } from './ui/shortcuts.js';
 import { initI18n } from './ui/i18n.js';
+import { initMatrixRain } from './ui/matrix-rain.js';
 
 async function boot() {
   await initI18n();
   initTheme();
+  initMatrixRain();
   initShortcuts();
   initSPALinks();
   route();
