@@ -1,6 +1,7 @@
 /* ============================================================
-   Burn Note — Design System v2 (Dev-Console)
+   Secure Note — Design System v2 (Dev-Console)
    Reference: design-system/MASTER.md
+   Dark palette aligned with SwiftVault (send.backsafe.de).
    ============================================================ */
 
 @import url('https://rsms.me/inter/inter.css');
@@ -66,16 +67,17 @@
 }
 
 html[data-theme="dark"] {
-  --bg: #0A0A0A;
-  --surface: #111113;
-  --surface-2: #17171A;
-  --border: #1F1F23;
-  --border-strong: #2A2A30;
-  --fg: #FAFAFA;
-  --fg-muted: #A1A1AA;
-  --fg-subtle: #71717A;
-  --accent: #3B82F6;
-  --accent-hover: #60A5FA;
+  /* Aligned with SwiftVault (send.backsafe.de) for unified Backsafe brand */
+  --bg: #0A0E17;
+  --surface: #0F1420;
+  --surface-2: #161B2C;
+  --border: #1C2333;
+  --border-strong: #2A3449;
+  --fg: #F8FAFC;
+  --fg-muted: #A1AABA;
+  --fg-subtle: #64748B;
+  --accent: #007AFF;
+  --accent-hover: #4DA3FF;
   --accent-fg: #FFFFFF;
   --danger: #F87171;
   --danger-soft: rgba(248, 113, 113, 0.12);
@@ -1202,3 +1204,79 @@ main:has(.page) { max-width: 720px; }
   margin: 0 0 var(--s-16);
   overflow-x: auto;
 }
+
+/* ============================================================
+   Brand polish — SwiftVault (send.backsafe.de) alignment
+   Dark mode only. Light mode stays neutral.
+   ============================================================ */
+
+html[data-theme="dark"] body {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(0, 122, 255, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(77, 163, 255, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(99, 102, 241, 0.02) 0%, transparent 50%);
+  background-attachment: fixed;
+}
+
+html[data-theme="dark"] ::selection {
+  background: rgba(0, 122, 255, 0.3);
+  color: #FFFFFF;
+}
+
+html[data-theme="dark"] {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 122, 255, 0.3) transparent;
+}
+
+html[data-theme="dark"] ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+html[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: rgba(0, 122, 255, 0.3);
+  border-radius: 3px;
+}
+
+html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 122, 255, 0.5);
+}
+
+/* Subtle brand glow on the header logo + wordmark */
+html[data-theme="dark"] header.global .brand-logo {
+  filter: drop-shadow(0 0 6px rgba(0, 122, 255, 0.32));
+  transition: filter var(--d-state) var(--e-out);
+}
+
+html[data-theme="dark"] header.global .brand:hover .brand-logo {
+  filter: drop-shadow(0 0 10px rgba(0, 122, 255, 0.55));
+}
+
+html[data-theme="dark"] header.global .brand span {
+  text-shadow: 0 0 18px rgba(0, 122, 255, 0.18);
+  letter-spacing: -0.01em;
+}
+
+/* Primary CTA picks up a soft accent halo on hover */
+html[data-theme="dark"] button:not(.btn-secondary):not(.ghost):not(.btn-ghost):not(.danger):not(.btn-danger):not(.icon-only):hover:not(:disabled),
+html[data-theme="dark"] .btn-primary:hover:not(:disabled),
+html[data-theme="dark"] .cta button:hover:not(:disabled) {
+  box-shadow:
+    0 0 0 1px rgba(0, 122, 255, 0.25),
+    0 0 22px rgba(0, 122, 255, 0.22),
+    0 0 48px rgba(0, 122, 255, 0.08);
+}
+
+/* Focus rings stay accent-blue but a touch softer in dark */
+html[data-theme="dark"] textarea:focus,
+html[data-theme="dark"] input:focus,
+html[data-theme="dark"] select:focus {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+/* Status / countdown dot inherits the new accent automatically via var(--accent) */

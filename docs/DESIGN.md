@@ -41,22 +41,28 @@ palette built on Backsafe Blue.
 
 ### Dark mode
 
+Aligned with SwiftVault (`send.backsafe.de`) so all Backsafe products share one
+dark identity. The active token set in `web-src/public/app.css` follows
+`design-system/MASTER.md` (semantic names `--surface`, `--accent`, …); the
+table below mirrors the same hex values under this older naming for archival
+reference.
+
 | Token | Value | Usage |
 |---|---|---|
-| `--bg` | `#0A0E1A` | Page background |
-| `--bg-subtle` | `#0F172A` | Card backgrounds |
-| `--bg-muted` | `#1E293B` | Muted surfaces |
+| `--bg` | `#0A0E17` | Page background (SwiftVault body) |
+| `--bg-subtle` | `#0F1420` | Card backgrounds |
+| `--bg-muted` | `#161B2C` | Muted surfaces |
 | `--fg` | `#F8FAFC` | Primary text |
-| `--fg-muted` | `#CBD5E1` | Secondary text |
+| `--fg-muted` | `#A1AABA` | Secondary text |
 | `--fg-subtle` | `#64748B` | Placeholders |
-| `--border` | `#1E293B` | Default border |
-| `--border-strong` | `#334155` | Emphasised border |
-| `--primary` | `#3B82F6` | Brand — lifted for contrast |
-| `--primary-hover` | `#60A5FA` | Primary action hover |
-| `--primary-fg` | `#0A0E1A` | Text on primary |
+| `--border` | `#1C2333` | Default border |
+| `--border-strong` | `#2A3449` | Emphasised border |
+| `--primary` | `#007AFF` | Brand — Backsafe blue (SwiftVault) |
+| `--primary-hover` | `#4DA3FF` | Primary action hover |
+| `--primary-fg` | `#FFFFFF` | Text on primary |
 | `--primary-subtle` | `#1E3A8A` | Primary tinted backgrounds |
-| `--accent` | `#60A5FA` | Interactive accents |
-| `--danger` | `#EF4444` | Destructive actions |
+| `--accent` | `#4DA3FF` | Interactive accents |
+| `--danger` | `#F87171` | Destructive actions |
 | `--danger-subtle` | `#7F1D1D` | Destructive tinted backgrounds |
 
 ## Typography

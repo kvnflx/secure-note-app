@@ -34,22 +34,35 @@ and success colors only appear when semantically needed.
 
 ### Dark (primary / default-first)
 
-| Token             | Value       |
-|-------------------|-------------|
-| `--bg`            | `#0A0A0A`   |
-| `--surface`       | `#111113`   |
-| `--surface-2`     | `#17171A`   |
-| `--border`        | `#1F1F23`   |
-| `--border-strong` | `#2A2A30`   |
-| `--fg`            | `#FAFAFA`   |
-| `--fg-muted`      | `#A1A1AA`   |
-| `--fg-subtle`     | `#71717A`   |
-| `--accent`        | `#3B82F6`   |
-| `--accent-hover`  | `#60A5FA`   |
-| `--accent-fg`     | `#FFFFFF`   |
-| `--danger`        | `#F87171`   |
-| `--success`       | `#4ADE80`   |
-| `--warning`       | `#FBBF24`   |
+Aligned with SwiftVault (`send.backsafe.de`) for a unified Backsafe brand
+across our crypto-first products. The dark palette pulls its blue-grey base
+and accent from SwiftVault; all other ratios stay design-system compliant.
+
+| Token             | Value       | Notes                                   |
+|-------------------|-------------|-----------------------------------------|
+| `--bg`            | `#0A0E17`   | SwiftVault body background              |
+| `--surface`       | `#0F1420`   | Matches SwiftVault `glass-card` opaque  |
+| `--surface-2`     | `#161B2C`   | Second-layer surface                    |
+| `--border`        | `#1C2333`   | SwiftVault default border               |
+| `--border-strong` | `#2A3449`   | Inputs / emphasised separators          |
+| `--fg`            | `#F8FAFC`   | SwiftVault `logo-wordmark` text         |
+| `--fg-muted`      | `#A1AABA`   | Slightly bluer than zinc-400            |
+| `--fg-subtle`     | `#64748B`   | Slate-500 for tertiary copy             |
+| `--accent`        | `#007AFF`   | SwiftVault primary (iOS-style blue)     |
+| `--accent-hover`  | `#4DA3FF`   | SwiftVault `neon-text-cyan`             |
+| `--accent-fg`     | `#FFFFFF`   |                                         |
+| `--danger`        | `#F87171`   |                                         |
+| `--success`       | `#4ADE80`   |                                         |
+| `--warning`       | `#FBBF24`   |                                         |
+
+**Brand polish (dark only):**
+- Body has soft radial gradients in `rgba(0,122,255,0.05)` for atmospheric depth.
+- Header logo uses `drop-shadow(0 0 6px rgba(0,122,255,0.32))`, intensifies on hover.
+- Brand wordmark gets `text-shadow: 0 0 18px rgba(0,122,255,0.18)`.
+- Primary CTA hover adds an accent halo via `box-shadow`. No glass blur, no scan lines — readability stays first.
+- Selection + scrollbar tinted with `rgba(0,122,255,0.3)`.
+
+Light mode keeps its neutral Linear/Vercel feel and is intentionally not aligned with SwiftVault (which is dark-only).
 
 **Rules:**
 - Never introduce a second brand hue. One accent, period.

@@ -4,7 +4,7 @@
   "description": "Sende verschlüsselte Notizen, die sich nach dem Lesen selbst zerstören.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0A0A0A",
+  "background_color": "#0A0E17",
   "theme_color": "#007AFF",
   "icons": [
     { "src": "/logo.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
