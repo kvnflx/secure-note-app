@@ -16,7 +16,7 @@ export function renderImprint(root) {
       <h2>Kontakt</h2>
       <p>
         E-Mail: <a href="mailto:kontakt@backsafe.de">kontakt@backsafe.de</a><br>
-        Telefon: <a href="tel:+4915221681788">+49 152 21681788</a>
+        Telefon: <a href="tel:+4915678553290">+49 156 78553290</a>
       </p>
 
       <h2>Steuerliche Angaben</h2>
