@@ -32,11 +32,14 @@ test('og-tags on /n/<id> are static across ids', async ({ request }) => {
   const htmlA = await a.text();
   const htmlB = await b.text();
 
-  // Both shells must contain the generic OG tags.
-  expect(htmlA).toMatch(/og:title/);
-  expect(htmlA).toContain('Click to reveal');
-  expect(htmlB).toMatch(/og:title/);
-  expect(htmlB).toContain('Click to reveal');
+  // Both shells must contain the generic OG tags. /n/<id> serves the same
+  // SPA shell as / (see RoutesWithStatic), so the preview is the site-wide
+  // one from index.html, not a note-specific text.
+  for (const html of [htmlA, htmlB]) {
+    expect(html).toMatch(/<meta property="og:title" content="[^"]+">/);
+    expect(html).toMatch(/<meta property="og:description" content="[^"]+">/);
+    expect(html).toContain('Burn after reading');
+  }
 
   // IDs must not leak into the shell HTML — the shell is identical.
   expect(htmlA).not.toContain('ABCDEFGHIJKLMNOP');
