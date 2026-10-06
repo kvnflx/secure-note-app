@@ -8,7 +8,7 @@ Playwright specs for secure-note-app. These assume a running Go backend on `:808
 # Terminal 1: start Redis (miniredis via go test helper or real Redis on :6379)
 # Terminal 2: start Go backend
 export PATH="/c/Program Files/Go/bin:$PATH"
-BURN_REDIS_SOCKET=localhost:6379 BURN_REDIS_NETWORK=tcp BURN_POW_DIFFICULTY=4 go run ./cmd/burn
+BURN_REDIS_SOCKET=localhost:6379 BURN_REDIS_NETWORK=tcp BURN_POW_DIFFICULTY=8 go run ./cmd/burn  # 8 is the minimum accepted by internal/config
 
 # Terminal 3: run Playwright
 cd web-src

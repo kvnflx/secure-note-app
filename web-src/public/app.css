@@ -906,7 +906,6 @@ pre code.hljs {
 
 .masked {
   -webkit-text-security: disc;
-  text-security: disc;
 }
 
 /* Skip link -------------------------------------------------- */
